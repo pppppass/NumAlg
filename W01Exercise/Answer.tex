@@ -1,0 +1,54 @@
+%! TeX encoding = UTF-8
+%! TeX program = LuaLaTeX
+
+\documentclass[english, nochinese]{pnote}
+\usepackage[paper]{pdef}
+
+\title{Answers to Exercises (Week 01)}
+\author{Zhihan Li}
+\date{September 19, 2018}
+
+\begin{document}
+
+\maketitle
+
+\textbf{Problem 1.} \textit{Proof.} The equation
+\begin{equation}
+A \rbr{ x_0 + y } = b
+\end{equation}
+is equivalent to
+\begin{equation}
+A y = r,
+\end{equation}
+and therefore it is sufficient to find $ y \in \mathop{\text{span}} \cbr{ r, A r, \cdots, A^{ n - 1 } r } $ satisfying this equation.
+
+Assume $m$ to be the maximal integer such that $ r, A r, \cdots, A^{ m - 1 } \in \mathbb{R}^n $ are linearly independent. Becuase $ \dim \mathbb{R}^n = n $, we deduce $ m \le n $. Say
+\begin{equation}
+a_0 r + a_1 A r + \cdots + a_m A^m r = 0.
+\end{equation}Claim
+We claim that $ a_0 \neq 0 $. Otherwise, we have
+\begin{equation}
+A \rbr{ a_1 r + a_2 A r + \cdots + a_m A^{ m - 1 } r } = 0
+\end{equation}
+and
+\begin{equation}
+a_1 r + a_2 A r + \cdots + a_m A^{ m - 1 } r = 0
+\end{equation}
+due to the non-singularity of $A$. However, this contradicts the definition of $m$. As a result, $ a_0 \neq 0 $. Set
+\begin{equation}
+y = - \rbr{ a_1 r + a_2 A r + \cdots + a_m A^{ m - 1 } r },
+\end{equation}
+we conclude
+\begin{equation}
+A y = r
+\end{equation}
+as desired.
+\hfill$\Box$
+
+\textbf{Problem 2.} \textit{Answer.} For $ \epsilon \neq 0 $, the matrix is diagonalizable becuase
+\begin{equation}
+\msbr{ 0 & 1 \\ 0 & \epsilon } = \msbr{ 1 & 1 \\ 0 & \epsilon } \msbr{ 0 & \\ & \epsilon } \msbr{ 1 & 1 \\ 0 & \epsilon }^{-1}.
+\end{equation}
+
+
+\end{document}

@@ -1,4 +1,6 @@
 # Temporary files
+.ipynb_checkpoints/
+*.bak
 
 # Generated files
 *.aux
@@ -10,3 +12,6 @@
 
 # Binary files
 *.pdf
+*.ipynb
+*.dat
+*.dir

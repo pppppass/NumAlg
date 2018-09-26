@@ -1,0 +1,138 @@
+%! TeX encoding = UTF-8
+%! TeX program = LuaLaTeX
+
+\documentclass[english, nochinese]{pnote}
+\usepackage[paper]{pdef}
+\usepackage{multirow}
+
+\title{Answers to Exercises (Week 02)}
+\author{Zhihan Li, 1600010653}
+\date{September 27, 2018}
+
+\begin{document}
+
+\maketitle
+
+\textbf{Problem 1. (Page 36 Exercise 5)} \textit{Proof.} We proceed to prove that the leading principle minors are non-singular. Assume the LU decomposition is $ A = L U $, where $L$ and $U$ are non-singular. Split $A$, $L$ and $U$ into
+\begin{gather}
+A = \msbr{ A_{ 1 1 } & A_{ 1 2 } \\ A_{ 2 1 } & A_{ 2 2 } }, \\
+L = \msbr{ L_{ 1 1 } & \\ L_{ 2 1 } & L_{ 2 2 } }, \\
+U = \msbr{ U_{ 1 1 } & U_{ 1 2 } \\ & U_{ 2 2 } }
+\end{gather}
+by the first $k$ and last $ n - k $ rows or columns. We deduce that
+\begin{equation}
+A_{ 1 1 } = L_{ 1 1 } U_{ 1 1 }.
+\end{equation}
+Because $L$ and $U$ are non-singular, $ L_{ 1 1 } $ and $ U_{ 1 1 } $ are also non-singular, and so is $ A_{ 1 1 } $. Varying $k$, this yields that all leading principle minors are non-singular. Applying the theorem of LU decomposition, the uniqueness is guaranteed.
+\hfill$\Box$
+
+\textbf{Problem 2. (Page 36 Exercise 8)} \textit{Proof.} Denote the Gauss transformation as $L$, and the $ \rbr{ i, j } $-entry of $ L A $ as $ a'_{ i j } $. From the definition of Gauss transformation, for $ k \ge 2 $, we have $ a'_{ k 1 } = 0 $ and
+\begin{equation}
+a'_{ k j } = a_{ k j } - \frac{ a_{ k 1 } a_{ 1 j } }{a_{ 1 1 }}
+\end{equation}
+for $ j \ge 2 $.
+It is sufficient to prove
+\begin{equation}
+\abs{a'_{ k k }} > \sum_{\sarr{c}{ j = 2 \\ j \neq k }}^n \abs{a'_{ k j }}.
+\end{equation}
+This is beceause
+\begin{equation}
+\begin{split}
+\text{LHS} &= \abs{ a_{ k k } - \frac{ a_{ k 1 } a_{ 1 k } }{a_{ 1 1 }} } \ge \abs{a_{ k k }} - \frac{\abs{a_{ k 1 }}}{\abs{a_{ 1 1 }}} \abs{a_{ 1 k }} \\
+&> \sum_{\sarr{c}{ j = 1 \\ j \neq k }}^n \abs{a_{ k j }} - \frac{\abs{a_{ k 1 }}}{\abs{a_{ 1 1 }}} \rbr{ \abs{a_{ 1 1 }} - \sum_{\sarr{c}{ j = 2 \\ j \neq k }}^n \abs{a_{ 1 j }} } \\
+&= \sum_{\sarr{c}{ j = 1 \\ j \neq k }}^n \rbr{ \abs{a_{ k j }} + \frac{\abs{a_{ k 1 }}}{\abs{a_{ 1 j }}} \abs{a_{ 1 1 }} } \ge \sum_{\sarr{c}{ j = 1 \\ j \neq k }}^n \abs{ a_{ k j } - \frac{ a_{ k 1 } a_{ 1 j } }{a_{ 1 1 }} } \\
+&= \text{RHS}.
+\end{split}
+\end{equation}
+\hfill$\Box$
+
+\textbf{Problem 3. (Page 37 Exercise 10)} \textit{Proof}. Let the Gauss transformation be $L$. Because $A$ is symmetric, we have
+\begin{equation}
+L A L^{\text{T}} = \msbr{ a_{ 1 1 } & \\ & A_2 }.
+\end{equation}
+Because $A$ is positive definite, therefore $ L A L^{\text{T}} $ is positive definite, and furthermore $A_2$ is positive definite as a result.
+\hfill$\Box$
+
+\textbf{Problem 4. (Page 37 Exercise 11)} \textit{Proof}. Let
+\begin{equation}
+L = \msbr{ L_{ 1 1 } & \\ L_{ 2 1 } & I }
+\end{equation}
+be the Gauss transformation and
+\begin{equation}
+L A = \msbr{ U_{ 1 1 } & U_{ 1 2 } \\ & U_{ 2 2 } }.
+\end{equation}
+We have
+\begin{gather}
+L_{ 2 1 } A_{ 1 1 } + A_{ 2 1 } = 0, \\
+L_{ 2 1 } A_{ 1 2 } + A_{ 2 2 } = U_{ 2 2 }.
+\end{gather}
+Because of the existence of the LU decomposition of $ A_{ 1 1 } $, we know that $ L_{ 1 1 } $, $ U_{ 1 1 } $ and $ A_{ 1 1 } $ are all non-singular. Therefore, solving the equations yields
+\begin{gather}
+L_{ 2 1 } = -A_{ 2 1 } A_{ 1 1 }^{-1}, \\
+U_{ 2 2 } = A_{ 2 2 } - A_{ 2 1 } A_{ 1 1 }^{-1} A_{ 1 2 }
+\end{gather}
+as desired.
+\hfill$\Box$
+
+\textbf{Problem 5. (Page 38 Exercise 14)} \textit{Answer.} Note that the $j$-th column of $A^{-1}$ is $ A^{-1} e_j $, and
+\begin{equation}
+L U A^{-1} e_j = A A^{-1} e_j = e_j.
+\end{equation}
+As a result, if we want to find the $ \rbr{ i, j } $-entry, we can calculate $ y = A^{-1} e_j $ by solving
+\begin{gather}
+L x = e_j,
+U y = x
+\end{gather}
+consecutively. Because $L$ is lower triangular and $U$ is upper triangular, solving these two equations takes $ n^2 + n^2 = 2 n^2 $ operations.
+
+\textbf{Problem 6. (Page 38 Exercise 15)} \textit{Proof.} Let
+\begin{equation}
+L^{\rbr{1}} = \msbr{ 1 & \\ -l^{\rbr{1}} & I }
+\end{equation}
+be the first Gauss transformation and
+\begin{equation}
+L^{\rbr{1}} A = \msbr{ a_{ 1 1 } & \ast \\ & A_{ 2 2 } }
+\end{equation}
+Since $A^{\text{T}}$ is strictly diagonally dominated, $ a_{ 1 1 } \neq 0 $ and such $L^{\rbr{1}}$ exists.
+Moreover, every entry in $l^{\rbr{1}}$, which is of the form $ a_{ j 1 } / a_{ 1 1 } $ for some $ j \neq 1 $, satisfies
+\begin{equation}
+\abs{\frac{a_{ j 1 }}{a_{ 1 1 }}} < 1.
+\end{equation}
+Because
+\begin{equation}
+L = \msbr{ 1 & \\ l^{\rbr{1}} & \ast },
+\end{equation}
+therefore $ \abs{l_{ j 1 }} < 1 $. We proceed to prove that $ A_{ 2 2 }^{\text{T}} $ is diagonally dominated as well. This is because for $ j \neq 1 $,
+\begin{equation}
+\begin{split}
+&\ptrel{=} \abs{ a_{ j j } - \frac{ a_{ 1 j } a_{ j 1 } }{ a_{ 1 1 } }} \ge \abs{a_{ j j }} - \frac{\abs{a_{ 1 j }}}{\abs{a_{ 1 1 }}} \abs{a_{ j 1 }} \\
+&> \sum_{\sarr{c}{ k = 1 \\ k \neq j }}^n \abs{a_{ k j }} - \frac{\abs{a_{ 1 j }}}{\abs{a_{ 1 1 }}} \rbr{ \abs{a_{ 1 1 }} - \sum_{\sarr{c}{ k = 2 \\ k \neq j }}^n \abs{a_{ k 1 }} } \\
+&= \sum_{\sarr{c}{ k = 2 \\ k \neq j }}^n \rbr{ \abs{a_{ k j }} + \frac{\abs{a_{ 1 j }}}{\abs{a_{ 1 1 }}} \abs{a_{ k 1 }} } \ge \sum_{\sarr{c}{ k = 2 \\ k \neq j }}^n \abs{ a_{ k j } - \frac{ a_{ 1 j } a_{ k 1 } }{a_{ 1 1 }}}.
+\end{split}
+\end{equation}
+Mathematical induction on $ A_{ 2 2 } $ yields the existence of consecutive Gauss transformations, together with $ \abs{l_{ i j }} < 1 $.
+\hfill$\Box$
+
+\textbf{Problem 7. (Page 39 Exercise 1)} \textit{Answer}. The analytical solution for this system is
+\begin{equation}
+x = \msbr{ 1 & 1 & \cdots & 1 }^{\text{T}}.
+\end{equation}
+We implement both the vanilla version, column-pivoted version and full-pivoted version of Gauss elimination (LU decomposition) and test the $\ell^{\infty}$ error between the solution yielded and $x$. The results are summarized in Table \ref{Tbl:Err}.
+
+\begin{table}[htb]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+\multirow{2}*{$n$} & \multicolumn{3}{|c|}{$\ell^{\infty}$ error} \\
+\cline{2-4}
+& Vanilla & Column-pivoted & Full-pivoted\\
+\hline
+\input{Table1.tbl}
+\end{tabular}
+\caption{$\ell^{\infty}$ error of Gauss elimination with different pivot strategy}
+\label{Tbl:Err}
+\end{table}
+
+From the result, it can be seen that the error by vanilla version blows up more quickly than the column-pivoted version. However, the column-pivoted version also blows up eventually. Note that full pivoting is equivalent to column pivoting here because of the special structure of the matrix: the largest element of the sub-matrix always appear in the leftmost column. In conclusion, Gauss elimination suffers from numerical instability even with pivoting, which can alleviate such problem to some extend.
+
+\end{document}

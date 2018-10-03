@@ -155,7 +155,5 @@ for n in n_list:
 
 with shelve.open("Result") as db:
     db["size"] = n_list
-    db["direct"] = rt[1]
-    db["colpivot"] = rt[0]
-    db["fullpivot"] = rt[2]
+    db["result"] = rt
 

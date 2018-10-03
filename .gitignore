@@ -1,17 +1,24 @@
 # Temporary files
 .ipynb_checkpoints/
 *.bak
-
-# Generated files
+*.run
 *.aux
 *.bbl
 *.blg
 *.log
 *.synctex.gz
 *.thm
+*.run
+__pycache__/
+
+# Generated files
+*.pgf
+*.tbl
 
 # Binary files
 *.pdf
 *.ipynb
 *.dat
 *.dir
+
+# External files

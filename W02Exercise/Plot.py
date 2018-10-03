@@ -12,9 +12,7 @@ import shelve
 
 with shelve.open("Result") as db:
     n = db["size"]
-    e_dir = db["direct"]
-    e_col = db["colpivot"]
-    e_full = db["fullpivot"]
+    rt = db["result"]
 
 
 # In[3]:
@@ -22,6 +20,6 @@ with shelve.open("Result") as db:
 
 with open("Table1.tbl", "w") as f:
     for i in range(len(n)):
-        f.write("{} & {:.5e} & {:.5e} & {:.5e} \\\\\n".format(n[i], e_dir[i], e_col[i], e_full[i]))
+        f.write("{} & {:.5e} & {:.5e} & {:.5e} \\\\\n".format(n[i], rt[1][i], rt[0][i], rt[2][i]))
         f.write("\\hline\n")
 

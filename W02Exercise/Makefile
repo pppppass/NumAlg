@@ -1,22 +1,28 @@
 TBLOBJS = Table1.tbl
+RUNOBJS = Problem7.run
 
 .PHONY: all
 all: Answer.pdf
 
-Answer.pdf: Answer.tex $(TBLOBJS)
+Answer.pdf: Answer.tex $(TBLOBJS) | Answer.aux
 	lualatex Answer.tex
 
-$(TBLOBJS): $(wildcard Result.dir) Plot.py
+Answer.aux: Answer.tex
+	lualatex Answer.tex
+
+$(TBLOBJS): $(wildcard $(RUNOBJS)) Plot.py
 	python Plot.py
 
-Result.dir: Problem7.py
-	python Problem7.py
-
+.PRECIOUS: %.py
 %.py: %.ipynb
 	jupyter nbconvert --to script $*
+
+%.run: %.py
+	python $<
+	touch $@
 
 .PHONY: report
 report: Answer.pdf
 
 .PHONY: run
-run: Result.dir
+run: $(RUNOBJS)

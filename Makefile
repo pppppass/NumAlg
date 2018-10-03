@@ -1,17 +1,30 @@
-DIRS = ptmpls W01Exercise W02Exercise
+DIRS = $(shell ls -d */ | grep -v ptmpls)
 
 .PHONY: all
-all: recursive environment.yml
+all: hardware.txt environment.yml recursive
+
+hardware.txt:
+	rm -f hardware.txt
+	echo 'lscpu:' >> hardware.txt
+	lscpu >> hardware.txt
+	echo 'lsmem:' >> hardware.txt
+	lsmem >> hardware.txt
+	echo 'uname -a:' >> hardware.txt
+	uname -a >> hardware.txt
 
 environment.yml:
 	conda env export > environment.yml
 
 .PHONY: recursive
-recursive:
+recursive: template
 	for DIR in $(DIRS);\
 	do\
 		$(MAKE) -C $${DIR};\
 	done
+
+.PHONY: template
+template:
+	$(MAKE) -C ptmpls
 
 .PHONY: environment
 environment: environment.yml

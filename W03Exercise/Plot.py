@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[9]:
+# In[1]:
 
 
 import shelve
@@ -19,7 +19,7 @@ with shelve.open("Result") as db:
     rt = db["4result"]
 
 
-# In[25]:
+# In[5]:
 
 
 title = ["<LABEL1>", "<LABEL2>", "LU", "Cholesky", "LDL\\textsuperscript{T}", "Banded LU"]
@@ -27,8 +27,7 @@ pyplot.figure(figsize=(6.0, 4.5))
 for i in range(6):
     pyplot.plot(n, rt[i][0], label=title[i])
     pyplot.scatter(n, rt[i][0], s=5.0)
-pyplot.plot([numpy.power(10.0, 1.5), 1.0e2], [1.0e1, 1.0e4], linewidth=0.5, color="black", label="Slope $6$")
-pyplot.plot([numpy.power(10.0, 1.5), 1.0e2], [1.0e-3, 1.0e-2], linewidth=0.5, color="black", linestyle="dashed", label="Slope $2$")
+pyplot.plot([numpy.power(10.0, 1.5), 1.0e2], [numpy.power(10.0, 0.5), numpy.power(10.0, 3.5)], linewidth=0.5, color="black", label="Slope $6$")
 pyplot.legend()
 pyplot.semilogx()
 pyplot.semilogy()
@@ -78,7 +77,7 @@ with shelve.open("Result") as db:
 
 with open("Table3.tbl", "w") as f:
     for i in range(len(n)):
-        f.write(("{} " + "& {:.3f} " * 4 + "\\\\\n").format(n[i], *(rt[j][0][i] for j in range(4))))
+        f.write(("{} " + "& {:.5f} " * 4 + "\\\\\n").format(n[i], *(rt[j][0][i] for j in range(4))))
         f.write("\\hline\n")
 
 

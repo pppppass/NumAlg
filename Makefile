@@ -9,10 +9,10 @@ hardware.txt:
 	echo 'lsmem:' >> hardware.txt
 	lsmem >> hardware.txt
 	echo 'uname -a:' >> hardware.txt
-	uname -a >> hardware.txt
+	uname -a | awk '$$2="********"' >> hardware.txt
 
 environment.yml:
-	conda env export > environment.yml
+	conda env export | grep -v prefix > environment.yml
 
 .PHONY: recursive
 recursive: template

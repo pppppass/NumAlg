@@ -1,5 +1,5 @@
 PGFOBJS = Figure1.pgf
-TBLOBJS = Table1.tbl Table2.tbl Table3.tbl Table4.tbl Table5.tbl
+TBLOBJS = Table1.tbl Table2.tbl Table3.tbl Table4.tbl Table5.tbl Table6.tbl
 RUNOBJS = Problem4.run Problem5.run
 
 .PHONY: all

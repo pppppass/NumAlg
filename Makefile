@@ -4,8 +4,7 @@ DIRS = $(shell ls -d */ | grep -v ptmpls)
 all: hardware.txt environment.yml recursive
 
 hardware.txt:
-	rm -f hardware.txt
-	echo 'lscpu:' >> hardware.txt
+	echo 'lscpu:' > hardware.txt
 	lscpu >> hardware.txt
 	echo 'lsmem:' >> hardware.txt
 	lsmem >> hardware.txt
@@ -28,4 +27,4 @@ template:
 
 .PHONY: environment
 environment: environment.yml
-	conda env create -f envorinment.yml
+	conda env create -f environment.yml

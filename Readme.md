@@ -9,12 +9,12 @@ This repository relies on the personal TeX templates package [ptmpls](https://gi
 ## Organization
 
 There are several sub folders in this repository:
-1. `WxxExercise`: Written exercise for week `xx`.
-2. `ptmpls`: Personal TeX / LaTeX templates.
+1. `ptmpls`: Personal TeX / LaTeX templates.
+2. `WxxExercise`: Written exercise for week `xx`.
 
 ## Environment
 
-All the numerical results are carried out on a specific environment. The hardware configuration can be found in `hardware.txt`. An Anaconda environment is also set up according to `environment.yml`.
+All the numerical results are produced in a specific environment. The hardware configuration can be found in `hardware.txt`. An Anaconda environment is also set up according to `environment.yml`.
 
 ## Usage
 

@@ -22,7 +22,7 @@ with shelve.open("Result") as db:
 # In[25]:
 
 
-title = ["<LABEL1>", "<LABEL2>", "LU", "Cholesky", "LDL", "Banded LU"]
+title = ["<LABEL1>", "<LABEL2>", "LU", "Cholesky", "LDL\\textsuperscript{T}", "Banded LU"]
 pyplot.figure(figsize=(6.0, 4.5))
 for i in range(6):
     pyplot.plot(n, rt[i][0], label=title[i])

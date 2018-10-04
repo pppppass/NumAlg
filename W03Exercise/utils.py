@@ -56,18 +56,25 @@ def solve_lu(mat, vec):
     return vec
 
 
-def calc_safe_sqrt(var):
-    return numpy.sqrt(numpy.clip(var, 0.0, numpy.infty))
+# def calc_safe_sqrt(var):
+#     return numpy.sqrt(numpy.clip(var, 0.0, numpy.infty))
 
 
 def fact_chol(mat):
+#     n = mat.shape[0]
+#     a = mat
+#     for i in range(n):
+#         a[i, i] = calc_safe_sqrt(a[i, i])
+#         a[i+1:, i] /= a[i, i]
+#         for j in range(i+1, n):
+#             a[j:, j] -= a[j:, i] * a[j, i]
+#     return a
     n = mat.shape[0]
     a = mat
     for i in range(n):
-        a[i, i] = calc_safe_sqrt(a[i, i])
+        a[i:, i] -= a[i:, :i].dot(a[i, :i])
+        a[i, i] = numpy.sqrt(a[i, i])
         a[i+1:, i] /= a[i, i]
-        for j in range(i+1, n):
-            a[j:, j] -= a[j:, i] * a[j, i]
     return a
 
 
@@ -103,14 +110,23 @@ def solve_chol(mat, vec):
 
 
 def fact_ldl(mat):
+#     n = mat.shape[0]
+#     a = mat
+#     t = numpy.zeros(n)
+#     for i in range(n-1):
+#         t[i+1:] = a[i+1:, i]
+#         a[i+1:, i] /= a[i, i]
+#         for j in range(i+1, n):
+#             a[j:, j] -= a[j:, i] * t[j]
+#     return a
     n = mat.shape[0]
     a = mat
-    t = numpy.zeros(n)
-    for i in range(n-1):
-        t[i+1:] = a[i+1:, i]
+    v = numpy.zeros(n)
+    d = a.diagonal()
+    for i in range(n):
+        v[:i] = d[:i] * a[i, :i]
+        a[i:, i] -= a[i:, :i].dot(v[:i])
         a[i+1:, i] /= a[i, i]
-        for j in range(i+1, n):
-            a[j:, j] -= a[j:, i] * t[j]
     return a
 
 

@@ -78,7 +78,7 @@ L u = 0.
 }
 {
 \small
-Here \verb"spsolve" stands for the sparse linear system solver provided by \verb"scipy.sparse.linalg.spsolve", and \verb"solve" stands for the dense linear system solver provided by \verb"numpy.linalg.solve". Note that the curves of Cholesky decomposition and LDL decomposition nearly overlap.
+Here \verb"spsolve" stands for the sparse linear system solver provided by \verb"scipy.sparse.linalg.spsolve", and \verb"solve" stands for the dense linear system solver provided by \verb"numpy.linalg.solve". Note that the curves of Cholesky decomposition and LDL\textsuperscript{T} decomposition nearly overlap.
 }
 \end{figure}
 \begin{table}[htb]
@@ -86,7 +86,7 @@ Here \verb"spsolve" stands for the sparse linear system solver provided by \verb
 \small
 \begin{tabular}{|c|c|c|c|c|c|c|}
 \hline
-$N$ & \verb"spsolve" & \verb"solve" & LU & Cholesky & LDL & Banded LU \\
+$N$ & \verb"spsolve" & \verb"solve" & LU & Cholesky & LDL\textsuperscript{T} & Banded LU \\
 \hline
 \input{Table6.tbl}
 \end{tabular}
@@ -94,7 +94,7 @@ $N$ & \verb"spsolve" & \verb"solve" & LU & Cholesky & LDL & Banded LU \\
 \label{Tbl:RunTime}
 \end{table}
 
-It can be seen from the figure that banded LU decomposition is much faster than other hand-written methods. The LU decomposition, Cholesky decomposition and LDL decomposition and \verb"solve" are all of complexity $ \Theta \rbr{N^6} $ (notice that the size of $L$ is $ N^2 \times N^2 $). Hand-written methods are significantly slower than \verb"solve" because of the efficiency of Python interpreter. Cholesky decomposition and LDL decomposition are slower than LU decomposition because the elimination of lower triangular matrix introduces a nested loop in Python, although the former is $ N^6 / 3 + O \rbr{N^4} $ while that of latter is $ 2 N^6 / 3 + O \rbr{N^4} $. Banded LU and \verb"spsolve" are of $ \Theta \rbr{N^2} $ asymptotically in terms of complexity.
+It can be seen from the figure that banded LU decomposition is much faster than other hand-written methods. The LU decomposition, Cholesky decomposition and LDL\textsuperscript{T} decomposition and \verb"solve" are all of complexity $ \Theta \rbr{N^6} $ (notice that the size of $L$ is $ N^2 \times N^2 $). Hand-written methods are significantly slower than \verb"solve" because of the efficiency of Python interpreter. Cholesky decomposition and LDL\textsuperscript{T} decomposition are slower than LU decomposition because the elimination of lower triangular matrix introduces a nested loop in Python, although the former is $ N^6 / 3 + O \rbr{N^4} $ while that of latter is $ 2 N^6 / 3 + O \rbr{N^4} $. Banded LU and \verb"spsolve" are of $ \Theta \rbr{N^2} $ asymptotically in terms of complexity.
 
 We also investigate errors of these methods. We compare the $\ell^{\infty}$ error between numerical and analytical solutions in Table \ref{Tbl:NumAna}, and that between numerical solutions in Table \ref{Tbl:NumNum}. In the latter table, the standard solution are chosen to be the ones given by \verb"spsolve".
 
@@ -103,7 +103,7 @@ We also investigate errors of these methods. We compare the $\ell^{\infty}$ erro
 \small
 \begin{tabular}{|c|c|c|c|c|c|c|}
 \hline
-$N$ & \verb"spsolve" & \verb"solve" & LU & Cholesky & LDL & Banded LU \\
+$N$ & \verb"spsolve" & \verb"solve" & LU & Cholesky & LDL\textsuperscript{T} & Banded LU \\
 \hline
 \input{Table1.tbl}
 \end{tabular}
@@ -116,7 +116,7 @@ $N$ & \verb"spsolve" & \verb"solve" & LU & Cholesky & LDL & Banded LU \\
 \small
 \begin{tabular}{|c|c|c|c|c|c|c|}
 \hline
-$N$ & \verb"spsolve" & \verb"solve" & LU & Cholesky & LDL & Banded LU \\
+$N$ & \verb"spsolve" & \verb"solve" & LU & Cholesky & LDL\textsuperscript{T} & Banded LU \\
 \hline
 \input{Table2.tbl}
 \end{tabular}
@@ -132,7 +132,7 @@ From these results, we verify the convergence of the numerical discretization sc
 \centering
 \begin{tabular}{|c|c|c|c|c|}
 \hline
-$n$ & \verb"solve" & LU & Cholesky & LDL \\
+$n$ & \verb"solve" & LU & Cholesky & LDL\textsuperscript{T} \\
 \hline
 \input{Table3.tbl}
 \end{tabular}
@@ -144,7 +144,7 @@ $n$ & \verb"solve" & LU & Cholesky & LDL \\
 \centering
 \begin{tabular}{|c|c|c|c|c|}
 \hline
-$n$ & \verb"solve" & LU & Cholesky & LDL \\
+$n$ & \verb"solve" & LU & Cholesky & LDL\textsuperscript{T} \\
 \hline
 \input{Table4.tbl}
 \end{tabular}
@@ -156,7 +156,7 @@ $n$ & \verb"solve" & LU & Cholesky & LDL \\
 \centering
 \begin{tabular}{|c|c|c|c|c|}
 \hline
-$n$ & \verb"solve" & LU & Cholesky & LDL \\
+$n$ & \verb"solve" & LU & Cholesky & LDL\textsuperscript{T} \\
 \hline
 \input{Table4.tbl}
 \end{tabular}
@@ -164,6 +164,6 @@ $n$ & \verb"solve" & LU & Cholesky & LDL \\
 \label{Tbl:Err2}
 \end{table}
 
-It can be seen that from these results that the three hand-written methods are slightly slower than packed solver \verb"solve" from NumPy. This is because Python is interpreted and hand-written codes takes noticeably much time than compiled ones. Cholesky solver and LDL solver are much slower because of nested loops, which has been discussed in Problem 4. Since the Hilbert matrix is highly singular, all the yielded solutions suffer from huge errors, which is caused by accumulation of tiny numerical rounding errors. Experimentally, LDL solver is slightly more stable than LU solver. However, Cholesky decomposition solver fails quickly because the invalidity of square rooting: the diagonal entry happen to be negative at some time because of rounding error and then square rooting directly raises an error, which leads to Not A Number error eventually.
+It can be seen that from these results that the three hand-written methods are slightly slower than packed solver \verb"solve" from NumPy. This is because Python is interpreted and hand-written codes takes noticeably much time than compiled ones. Cholesky solver and LDL\textsuperscript{T} solver are much slower because of nested loops, which has been discussed in Problem 4. Since the Hilbert matrix is highly singular, all the yielded solutions suffer from huge errors, which is caused by accumulation of tiny numerical rounding errors. Experimentally, LDL\textsuperscript{T} solver is slightly more stable than LU solver. However, Cholesky decomposition solver fails quickly because the invalidity of square rooting: the diagonal entry happen to be negative at some time because of rounding error and then square rooting directly raises an error, which leads to Not A Number error eventually.
 
 \end{document}

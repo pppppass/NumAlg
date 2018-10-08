@@ -52,7 +52,7 @@ operations. The final number of operators is $ n^3 + O \rbr{n^2} $, and the temp
 
 \textbf{Problem 4.} \textit{Answer.} (1) Denote the numerical solution $u$ as the $ \rbr{ N - 1 }^2 $-vector
 \begin{equation}
-u = \msbr{ u_{ 1 1 } & u_{ 1 2 } & \cdots & u_{ 1 N } & u_{ 2 1 } & u_{ 2 2 } & \cdots & u_{ 2 N } & \cdots & u_{ N 1 } & u_{ 2 2 } & \cdots & u_{ N N } }^{\text{T}}.
+u = \msbr{ u_{ 1 1 } & u_{ 1 2 } & \cdots & u_{ 1, N - 1 } & u_{ 2 1 } & u_{ 2 2 } & \cdots & u_{ 2, N - 1 } & \cdots & u_{ N - 1, 1 } & u_{ N - 1, 2 } & \cdots & u_{ N - 1, N - 1 } }^{\text{T}}.
 \end{equation}
 Denote the discretized differential operator $L$ as the $ \rbr{ N - 1 }^2 \times \rbr{ N - 1 }^2 $ matrix
 \begin{equation}

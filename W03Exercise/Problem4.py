@@ -17,7 +17,7 @@ import utils
 
 def get_func(size):
     n = size
-    x, y = numpy.linspace(0.0, 1.0, n+2)[1:-1], numpy.linspace(0.0, 1.0, n+2)[1:-1]
+    x, y = numpy.linspace(0.0, 1.0, n+1)[1:-1], numpy.linspace(0.0, 1.0, n+1)[1:-1]
     y, x = numpy.meshgrid(x, y)
     f = 2.0 * numpy.pi**2 * numpy.sin(numpy.pi * x) * numpy.sin(numpy.pi * y)
     f = f.reshape(-1)
@@ -29,7 +29,7 @@ def get_func(size):
 
 def get_sol(size):
     n = size
-    x, y = numpy.linspace(0.0, 1.0, n+2)[1:-1], numpy.linspace(0.0, 1.0, n+2)[1:-1]
+    x, y = numpy.linspace(0.0, 1.0, n+1)[1:-1], numpy.linspace(0.0, 1.0, n+1)[1:-1]
     y, x = numpy.meshgrid(x, y)
     s = numpy.sin(numpy.pi * x) * numpy.sin(numpy.pi * y)
     s = s.reshape(-1)
@@ -41,16 +41,16 @@ def get_sol(size):
 
 def get_mat_sparse(size):
     n = size
-    h = 1.0 / (n + 1)
+    h = 1.0 / n
     l = []
-    for i in range(n):
-        for j in range(n):
+    for i in range(n-1):
+        for j in range(n-1):
             l.append((4.0, i, j, i, j))
             l.append((-1.0, i, j, i, j-1))
             l.append((-1.0, i, j, i, j+1))
             l.append((-1.0, i, j, i-1, j))
             l.append((-1.0, i, j, i+1, j))
-    a = utils.cvrt_list_to_csr(n, l)
+    a = utils.cvrt_list_to_csr(n-1, l)
     a = a / h**2
     return a
 

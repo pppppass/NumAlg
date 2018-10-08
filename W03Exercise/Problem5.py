@@ -1,36 +1,36 @@
 
 # coding: utf-8
 
-# In[ ]:
+# In[1]:
 
 
 import time
 import shelve
 import numpy
+import scipy.linalg
 import scipy.sparse
 import scipy.sparse.linalg
 import utils
 
 
-# In[1]:
+# In[2]:
 
 
 n_list = [5, 10, 15, 20, 30, 40, 50]
 
 
-# In[ ]:
+# In[3]:
 
 
 rt = [[[], [], []], [[], [], []], [[], [], []], [[], [], []]]
 
 
-# In[ ]:
+# In[4]:
 
 
 for n in n_list:
     
-    x, y = numpy.indices((n, n))
-    a = 1.0 / (1.0 + x + y)
+    a = scipy.linalg.hilbert(n)
     b = a.sum(axis=1)
     x = numpy.ones(n)
     
@@ -53,7 +53,7 @@ for n in n_list:
     print("n = {} finished".format(n))
 
 
-# In[ ]:
+# In[5]:
 
 
 with shelve.open("Result") as db:

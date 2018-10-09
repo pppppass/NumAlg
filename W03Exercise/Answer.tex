@@ -8,7 +8,7 @@
 
 \title{Answers to Exercises (Week 03)}
 \author{Zhihan Li, 1600010653}
-\date{October 4, 2018}
+\date{October 9, 2018}
 
 \begin{document}
 
@@ -18,7 +18,7 @@
 \begin{equation}
 A = L U = \rbr{ U^{\text{T}} D^{-1} } \rbr{ D L^{\text{T}} }
 \end{equation}
-and therefore $ L = U^{\text{T}} D^{-1} $, $ A = L D L^{\text{T}} $. Since $A$ is positive definite, we obtain $ D \prec 0 $ and
+and therefore $ L = U^{\text{T}} D^{-1} $, $ A = L D L^{\text{T}} $. Since $A$ is positive definite, we obtain $ D \succ 0 $ and
 \begin{equation}
 A = \rbr{ L D^{ 1 / 2 } } \rbr{ D^{ 1 / 2 } L^{\text{T}} },
 \end{equation}
@@ -40,7 +40,7 @@ and therefore the uniqueness of LU decomposition yields $ L = \tilde{L} $, $ D L
 \begin{equation}
 \sum_{ k = 1 }^n 2 k \rbr{ n - k } = \frac{1}{3} n^3 + O \rbr{n^2}
 \end{equation}
-operations. We then calculate $ D^{-1} L^{-1} $, which takes $ O \rbr{n^2} $ operators. We finally calculate
+operations. We then calculate $ D^{-1} L^{-1} $, which takes $ O \rbr{n^2} $ operations. We finally calculate
 \begin{equation}
 A^{-1} = L^{-\text{T}} \rbr{ D^{-1} L^{-1} },
 \end{equation}
@@ -48,7 +48,7 @@ this takes
 \begin{equation}
 \sum_{ k = 1 }^n \rbr{ n + 1 - k } \rbr{ 2 k - 1 } = \frac{1}{3} n^3 + O \rbr{n^2}
 \end{equation}
-operations. The final number of operators is $ n^3 + O \rbr{n^2} $, and the temporary space we need is $n^2$.
+operations. The final number of operations is $ n^3 + O \rbr{n^2} $, and the temporary space we need is $n^2$.
 
 \textbf{Problem 4.} \textit{Answer.} (1) Denote the numerical solution $u$ as the $ \rbr{ N - 1 }^2 $-vector
 \begin{equation}
@@ -78,7 +78,7 @@ L u = 0.
 }
 {
 \small
-Here \verb"spsolve" stands for the sparse linear system solver provided by \verb"scipy.sparse.linalg.spsolve", and \verb"solve" stands for the dense linear system solver provided by \verb"numpy.linalg.solve". Note that the curves of Cholesky decomposition and LDL\textsuperscript{T} decomposition nearly overlap.
+Here \verb"spsolve" stands for the sparse linear system solver provided by \verb"scipy.sparse.linalg.spsolve", and \verb"solve" stands for the dense linear system solver provided by \verb"numpy.linalg.solve". Note that the curves of Cholesky decomposition and LDL\textsuperscript{T} decomposition almost overlap.
 }
 \end{figure}
 \begin{table}[htb]
@@ -94,9 +94,9 @@ $N$ & \verb"spsolve" & \verb"solve" & LU & Cholesky & LDL\textsuperscript{T} & B
 \label{Tbl:RunTime}
 \end{table}
 
-It can be seen from the figure that banded LU decomposition is much faster than other hand-written methods. The LU decomposition, Cholesky decomposition and LDL\textsuperscript{T} decomposition and \verb"solve" are all of complexity $ \Theta \rbr{N^6} $ (notice that the size of $L$ is $ N^2 \times N^2 $). Hand-written methods are significantly slower than \verb"solve" because of the efficiency of Python interpreter. LU decomposition is slower than Cholesky decomposition and LDL\textsuperscript{T} decomposition because the complexity of them are $ 2 N^6 / 3 + O \rbr{N^4} $ and $ N^6 / 3 + O \rbr{N^4} $ respectively. Although Banded LU should enjoy a complexity of $ \Theta \rbr{N^4} $ theoretically, the loop in Python of $ \Theta \rbr{N^2} $ times dominates the time cost here.
+It can be seen from the figure that banded LU decomposition is much faster than other hand-written methods. The LU decomposition, Cholesky decomposition and LDL\textsuperscript{T} decomposition and \verb"solve" are all of complexity $ \Theta \rbr{N^6} $ (notice that the size of $L$ is $ \Theta \rbr{N^4} $). Hand-written methods are significantly slower than \verb"solve" because of the efficiency of Python interpreter. LU decomposition is slower than Cholesky decomposition and LDL\textsuperscript{T} decomposition because the complexity of them are $ 2 N^6 / 3 + O \rbr{N^4} $ and $ N^6 / 3 + O \rbr{N^4} $ respectively. Although Banded LU should enjoy a complexity of $ \Theta \rbr{N^4} $ theoretically, the loop in Python of $ \Theta \rbr{N^2} $ times dominates the time cost here.
 
-We also investigate errors of these methods. We compare the $\ell^{\infty}$ error between numerical and analytical solutions in Table \ref{Tbl:NumAna}, and that between numerical solutions in Table \ref{Tbl:NumNum}. In the latter table, the standard solution are chosen to be the ones given by \verb"spsolve".
+We also investigate errors of these methods. We compare the $\ell^{\infty}$ error between numerical and analytical solutions in Table \ref{Tbl:NumAna}, and that between numerical solutions in Table \ref{Tbl:NumNum}. In the latter table, the standard solutions are chosen to be the ones given by \verb"spsolve".
 
 \begin{table}[htb]
 \centering

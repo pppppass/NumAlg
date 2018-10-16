@@ -1,0 +1,200 @@
+%! TeX encoding = UTF-8
+%! TeX program = LuaLaTeX
+
+\documentclass[english, nochinese]{pnote}
+\usepackage[paper]{pdef}
+
+\DeclareMathOperator\opfl{\mathrm{fl}}
+
+\title{Answers to Exercises (Week 04)}
+\author{Zhihan Li, 1600010653}
+\date{October 16, 2018}
+
+\begin{document}
+
+\maketitle
+
+\textbf{Problem 1. (Page 73 Exercise 2)} \textit{Proof.} Squaring the equation we obtain
+\begin{equation}
+\rbr{ x + y }^{\text{T}} \rbr{ x + y } = x^{\text{T}} x + 2 \norm{x}_2 \norm{y}_2 + y^{\text{T}} y.
+\end{equation}
+Cancelling and squaring again yield
+\begin{equation}
+\rbr{ x^{\text{T}} y }^2 = \rbr{ x^{\text{T}} x } \rbr{ y^{\text{T}} y }
+\end{equation}
+from which $ x^{\text{T}} y \ge 0 $ follows immediately. For the linear dependency, we observe
+\begin{equation}
+\rbr{ \lambda x + \mu y }^{\text{T}} \rbr{ \lambda x + \mu y } = x^{\text{T}} x \lambda^2 + 2 x^{\text{T}} y \lambda \mu + y^{\text{T}} y \mu^2
+\end{equation}
+has discriminant
+\begin{equation}
+\Delta = 4 \rbr{ x^{\text{T}} y }^2 - 4 \rbr{ x^{\text{T}} x } \rbr{ y^{\text{T}} y } = 0,
+\end{equation}
+which implies the existence of a set of non-zero $ \rbr{ \lambda, \mu } $ such that
+\begin{equation}
+\rbr{ \lambda x + \mu y }^{\text{T}} \rbr{ \lambda x + \mu y } = 0
+\end{equation}
+and therefore
+\begin{equation}
+\lambda x + \mu y = 0
+\end{equation}
+as desired.
+\hfill$\Box$
+
+\textbf{Problem 2. (Page 73 Exercise 4)} \textit{Proof.} Assume $ A = \msbr{ a_1 & a_2 & \cdots & a_n } $ and $ B = \msbr{ b_1 & b_2 & \cdots & b_n } $. Since
+\begin{equation}
+\norm{ A B }_{\text{F}} = \sqrt{ \sum_{ i = 1 }^n \norm{ A b_i }_2^2 }
+\end{equation}
+and
+\begin{equation}
+\norm{ A b_i }_2 \le \norm{A}_2 \norm{b_i}_2,
+\end{equation}
+we deduce
+\begin{equation}
+\norm{ A B }_F \le \sqrt{ \sum_{ i = 1 }^n \norm{A_2}_2^2 \norm{b_i}_2^2 } = \norm{A_2}_2^2 \norm{B}_{\text{F}}.
+\end{equation}
+Another equation follows from
+\begin{equation}
+\norm{ A B }_{\text{F}} = \norm{ B^{\text{T}} A^{\text{T}} }_{\text{F}} \le \norm{B^{\text{T}}}_{2} \norm{A^{\text{T}}}_{\text{F}} = \norm{A}_{\text{F}} \norm{B}_2.
+\end{equation}
+\hfill$\Box$
+
+\textbf{Problem 3. (Page 73 Exercise 9)} \textit{Proof.} We have
+\begin{equation}
+\begin{split}
+\norm{ A^{-1} x } &= \max_{ \norm{x} = 1 } \norm{ A^{-1} x } = \max_{ x \neq 0 } \frac{\norm{ A^{-1} x }}{\norm{x}} \\
+&= \max_{ y = A^{-1} x \neq 0 }  \frac{\norm{y}}{\norm{ A y }} = \rbr{ \min_{ y \neq 0 } \frac{\norm{ A y }}{\norm{y}} }^{-1} = \rbr{ \min_{ \norm{y} = 1 } \norm{ A y } }^{-1}.
+\end{split}
+\end{equation}
+\hfill$\Box$
+
+\textbf{Problem 4. (Page 73 Exercise 11)} \textit{Answer.} (1) We have
+\begin{equation}
+\det A = 2
+\end{equation}
+and
+\begin{equation*}
+A^{-1} = \frac{1}{2} \msbr{ 750 & -374 \\ -752 & 375 }.
+\end{equation*}
+Since $ \norm{A}_{\infty} = 1502 $ and $ \norm{A^{-1}}_{\infty} = 1127 / 2 $, we have
+\begin{equation}
+\kappa_{\infty} \rbr{A} = 864377.
+\end{equation}
+
+(2) Choose $ x = \msbr{ 1 & -1 }^{\text{T}} $, $ b = \msbr{ 1 & 2 }^{\text{T}} $, $ \delta x = \msbr{ 375 \epsilon & -376 \epsilon }^{\text{T}} $, $ \delta b = \msbr{ \epsilon & 0 }^{\text{T}} $ with $ \epsilon > 0 $. In this case,
+\begin{gather}
+\frac{\norm{ \delta b }_{\infty}}{\norm{b}_{\infty}} = \frac{\epsilon}{2}, \\
+\frac{\norm{ \delta x }_{\infty}}{\norm{x}_{\infty}} = 376 \epsilon.
+\end{gather}
+
+(3) Choose $ x = \msbr{ 1 & -1 }^{\text{T}} $, $ b = \msbr{ 1 & 2 }^{\text{T}} $, $ \delta x = \msbr{ \epsilon & \epsilon }^{\text{T}} $, $ \delta b = \msbr{ 749 \epsilon & 1502 \epsilon }^{\text{T}} $ with $ \epsilon > 0 $. In this case,
+\begin{gather}
+\frac{\norm{ \delta b }_{\infty}}{\norm{b}_{\infty}} = 751 \epsilon, \\
+\frac{\norm{ \delta x }_{\infty}}{\norm{x}_{\infty}} = \epsilon.
+\end{gather}
+
+\textbf{Problem 5. (Page 74 Exercise 13)} \textit{Proof.} We have
+\begin{equation}
+\begin{split}
+&\ptrel{=} \norm{ \rbr{ A + E }^{-1} - A^{-1} } \\
+&= \norm{ \rbr{ A + E }^{-1} \rbr{ I - \rbr{ A + E } A^{-1} } } \\
+&= \norm{ \rbr{ A + E }^{-1} E A^{-1} } \\
+&\le \norm{E} \norm{A^{-1}} \norm{\rbr{ A + E }^{-1}}.
+\end{split}
+\end{equation}
+\hfill$\Box$
+
+\textbf{Problem 6. (Page 74 Exercise 16)} \textit{Answer.} From the computational process, we knows
+\begin{equation}
+\begin{split}
+&\ptrel{=} \rbr{\opfl{ A x }}_i = \opfl \rbr{ \sum_{ j = 1 }^n a_{ i j } x_j } \\
+&= \rbr{ \rbr{ \rbr{ \rbr{ 1 + \delta_1 } a_1 x_1 + \rbr{ 1 + \delta_2 } a_2 x_2 } \rbr{ 1 + \gamma_2 } + \rbr{ 1 + \delta_3 } a_3 x_3 } \rbr{ 1 + \gamma_3 } + \cdots } \rbr{ 1 + \gamma_n } \\
+&= \sum_{ j = 1 }^n a_{ i j } x_j \rbr{ 1 + \delta_j } \prod_{ k = j }^n \rbr{ 1 + \gamma_j }
+\end{split}
+\end{equation}
+where we define $ \gamma_1 = 0 $ and $ \abs{\delta_i}, \abs{\gamma_i} \le u $. Since $ n u \le 0.01 $ we deduce
+\begin{gather}
+\abs{ \rbr{ 1 + \delta_1 } \prod_{ k = 1 }^n \rbr{ 1 + \gamma_k } - 1 } \le 1.01 n u, \\
+\abs{ \rbr{ 1 + \delta_j } \prod_{ k = j }^n \rbr{ 1 + \gamma_k } - 1 } \le 1.01 \rbr{ n - j + 2 } u
+\end{gather}
+for $ j \ge 2 $. Define
+\begin{equation}
+e_{ i j } = a_{ i j } \rbr{ 1 + \delta_j } \prod_{ k = j }^n \rbr{ 1 + \gamma_j } - a_{ i j },
+\end{equation}
+it follows
+\begin{equation}
+\abs{e_{ i 1 }} \le 1.01 n u \abs{a_{ i 1 }}, \\
+\abs{e_{ i j }} \le 1.01 \rbr{ n - j + 2 } u \abs{a_{ i j }}
+\end{equation}
+for $ j \ge 2 $ and
+\begin{equation}
+\rbr{ \opfl A x }_i = \sum_{ j = 1 }^n \rbr{ \rbr{ a_{ i j } + e_{ i j } } x_j }.
+\end{equation}
+as desired.
+\hfill$\Box$
+
+\textbf{Problem 7. (Page 74 Exercise 18)} \textit{Proof.} We proceed to prove $ \tilde{U}_{ i j } $ for $ j \ge i $ satisfies
+\begin{equation}
+\abs{\tilde{U}_{ i j }} \le \max_{ i, j } \abs{A_{ i j }}
+\end{equation}
+first. Since $A$ is tri-diagonal, the strict upper triangular component of $ P A $ has only one non-zero entry per column. Note that we have
+\begin{equation}
+\tilde{U}_{ i j } = \rbr{ \rbr{ P A }_{ i j } - \tilde{L}^{\rbr{ i - 1 }}_{ i \rbr{ i - 1 } } \tilde{U}_{ \rbr{ i - 1 } j } \rbr{ 1 + \gamma_{ i j } } } \rbr{ 1 + \epsilon_{ i j } }
+\end{equation}
+where $\tilde{L}^{\rbr{i}}$ means the matrix after the $i$-th row swaps and Gauss transformation. Since
+\begin{equation}
+\abs{ \tilde{L}^{\rbr{ i - 1 }}_{ i \rbr{ i - 1 } } \tilde{U}_{ \rbr{ i - 1 } j } \rbr{ 1 + \gamma_{ i j } } } \le \abs{\tilde{U}_{ \rbr{ i - 1 } j }}
+\end{equation}
+because of column pivoting and the monotonicity of elementary operations ( $ \abs{ \tilde{L}_{ i \rbr{ i - 1 } }^{\rbr{ i - 1 }} } \le 1 $ and therefore $ \opfl \rbr{ \tilde{L}_{ i \rbr{ i - 1 } }^{\rbr{ i - 1 }} \tilde{U}_{ \rbr{ i - 1 } j } } \le \abs{\tilde{U}_{ \rbr{ i - 1 } j }} $ must hold even in rounding error), and therefore
+\begin{equation}
+\abs{\tilde{U}_{ i j }} \le
+\begin{cases}
+\max_{ i, j } \abs{A_{ i j }} & \rbr{ P A }_{ i j } \neq 0, \\
+\abs{\tilde{U}_{ \rbr{ i - 1 } j }} & \rbr{ P A }_{ i j } = 0.
+\end{cases}
+\end{equation}
+and the claim in the very beginning is proved. Similarly, we have
+\begin{equation}
+\tilde{U}_{ i i } = \rbr{ \rbr{ P A }_{ i i } - \tilde{L}_{ i \rbr{ i - 1 } }^{\rbr{ i - 1 }} \tilde{U}_{ \rbr{ i - 1 } i } \rbr{ 1 + \gamma_{ i i }} } \rbr{ 1 + \epsilon_{ i i } }
+\end{equation}
+and it follows from monotonicity again that
+\begin{equation}
+\abs{\tilde{U}_{ i i }} \le \abs{\rbr{ P A }_{ i i }} + \abs{\tilde{U}_{ \rbr{ i - 1 } i }} \le 2 \max_{ i, j } \abs{A_{ i j }}.
+\end{equation}
+This yields
+\begin{equation}
+\max_{ i, j } \abs{\tilde{U}_{ i j }} \le 2 \max_{ i, j } \abs{\tilde{A}_{ i j }}
+\end{equation}
+and
+\begin{equation}
+\rho \le 2
+\end{equation}
+as desired.
+\hfill$\Box$
+
+\textbf{Problem 8. (Page 75 Exercise 20)} \textit{Answer.} \textit{A posteriori} error estimation. We use the conclusion from the textbook here, that is,
+\begin{equation}
+\abs{E} \le 2.05 n u \abs{\tilde{L}} \abs{\tilde{U}}
+\end{equation}
+as long as $ 1.01 n u \le 0.01 $. This implies
+\begin{equation}
+\norm{E}_{\infty} \le 2.05 n u \norm{\tilde{L}}_{\infty} \norm{\tilde{U}}_{\infty}.
+\end{equation}
+(It is hard to introduce $m$ to optimize the bound here since the lower bandwidth $\tilde{L}$ may reach $n$ actually. This is because the banded structure only constrains that there are at most $ m + 1 $ non-zero entries in one column of $\tilde{L}$ but no restriction on rows is imposed.)
+
+\textit{A priori} error estimation. Applying similar technique introduced in Problem 7, we can prove
+\begin{equation}
+\norm{\tilde{U}_{ i \cdot }}_1 \le 45 \max_i \norm{A_{ i \cdot }}_1 = 45 \norm{A}_{\infty}.
+\end{equation}
+Since $ \abs{L_{ i j }} \le 1 $, we knows that
+\begin{equation}
+\norm{ \abs{\tilde{L}} \abs{\tilde{U}} }_{\infty} = \max_i \sum_{ j = 1 }^n \abs{\tilde{L}}_{ i \cdot } \abs{\tilde{U}}_{ \cdot j } \le \sum_{ j = 1 }^n \norm{\tilde{U}_{ \cdot j }}_1 = \sum_{ i = 1 }^n \norm{\tilde{U}_{ i \cdot }}_1 \le 45 n \norm{A}_{\infty}.
+\end{equation}
+It follows that
+\begin{equation}
+\norm{E}_{\infty} \le 92.25 n^2 u \norm{A}_{\infty}.
+\end{equation}
+
+
+
+\end{document}

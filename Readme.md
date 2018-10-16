@@ -9,13 +9,26 @@ This repository relies on the personal TeX templates package [ptmpls](https://gi
 ## Organization
 
 There are several sub folders in this repository:
-1. `ptmpls`: Personal TeX / LaTeX templates.
+1. `ptmpls`: Personal TeX / LaTeX templates;
 2. `WxxExercise`: Written exercise for week `xx`.
 
 ## Environment
 
-All the numerical results are produced in a specific environment. The hardware configuration can be found in `hardware.txt`. An Anaconda environment is also set up according to `environment.yml`.
+All the numerical results are all produced in a specific environment. The hardware configuration can be found in `hardware.txt`. An Anaconda environment is set up according to `environment.yml`.
 
 ## Usage
 
-There are Makefiles distributed in folders and one may execute `make` on the root folder to recursively compile all reports. One may also proceed down to each folder and execute `make run` to run the codes or `make report` to generate one single report. One may also execute `make environment`, when Anaconda is activated, to create an Anaconda environment according to `environment.yml`.
+There are Makefiles distributed in folders.
+
+To compile reports:
+1. Install TeX Live or other TeX utilities with LuaLaTeX and ensure that they can be found by `PATH`;
+2. Execute `make` in the root folder to recursively compile all reports;
+3. Or proceed down to a folder and execute `make report` to generate one single report;
+4. The reports are `Answer.pdf` or `Report.pdf` in each folder.
+
+To reproduce the numerical results:
+1. Activate Anaconda and execute `make environment` in the root folder to create a new environment `numpde`;
+2. Activate the environment `numpde`;
+3. Proceed down to a folder and execute `make run` to reproduce numerical results;
+4. Execute `make report` or `make` to regenerate the report;
+5. The numerical results are updated in the report, i.e., `Answer.pdf` or `Report.pdf`.

@@ -10,7 +10,7 @@ Answer.pdf: Answer.tex $(TBLOBJS) | Answer.aux
 Answer.aux: Answer.tex
 	lualatex Answer.tex
 
-$(TBLOBJS): $(wildcard $(RUNOBJS)) Plot.py
+$(TBLOBJS): $(wildcard $(RUNOBJS)) $(if $(wildcard Result.dir), Plot.py)
 	python Plot.py
 
 .PRECIOUS: %.py

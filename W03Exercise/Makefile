@@ -12,7 +12,7 @@ Answer.aux: Answer.tex
 	lualatex Answer.tex
 
 .SECONDEXPANSION:
-$(PGFOBJS) $(TBLOBJS): $(wildcard $(RUNOBJS)) Plot.py
+$(PGFOBJS) $(TBLOBJS): $(wildcard $(RUNOBJS)) $(if $(wildcard Result.dir), Plot.py)
 	python Plot.py
 	sed -i 's/<LABEL1~*>/\\verb"spsolve"/' Figure1.pgf
 	sed -i 's/<LABEL2~*>/\\verb"solve"/' Figure1.pgf

@@ -1,0 +1,190 @@
+%! TeX encoding = UTF-8
+%! TeX program = LuaLaTeX
+
+\documentclass[english, nochinese]{pnote}
+\usepackage[paper]{pdef}
+
+\DeclareMathOperator\opfl{\mathrm{fl}}
+
+\title{Answers to Exercises (Week 06)}
+\author{Zhihan Li, 1600010653}
+\date{October 24, 2018}
+
+\begin{document}
+
+\maketitle
+
+\textbf{Problem 1. (Page 97 Exercise 2)} \textit{Answer.} The equation $ A^{\text{T}} A x = A^{\text{T}} b $ is
+\begin{equation}
+\msbr{ 6 & 3 & 1 & 1 \\ 3 & 9 & 3 & 3 \\ 1 & 3 & 1 & 1 \\ 1 & 3 & 1 & 1 } \msbr{ x_1 \\ x_2 \\ x_3 \\ x_4 } = \msbr{ 4 \\ 3 \\ 1 \\ 1 }.
+\end{equation}
+The system of solutions is
+\begin{equation}
+\msbr{ x_1 \\ x_2 \\ x_3 \\ x_4 } = \msbr{ 3 / 5 \\ 2 / 15 \\ 0 \\ 0 } + c_1 \msbr{ 0 \\ 1/3 \\ -1 \\ 0 } + c_2 \msbr{ 0 \\ 1/3 \\ 0 \\ -1 }.
+\end{equation}
+
+\textbf{Problem 2. (Page 97 Exercise 3)} \textit{Answer.} We restrict the transform on the $2$, $5$ and $6$-th entries, and we aim to find a transform which transform $ x = \rbr{ 0, 3, 4 } $ to $ \rbr{ \alpha, 0, 0 } $. The orthogonality of Householder transform yields $ \alpha = \sqrt{ 3^2 + 4^2 } = 3 $. The Householder vector is
+\begin{equation}
+\frac{ x - \alpha e_1 }{\norm{ x - \alpha e_1 }} = \rbr{ -\frac{ 5 \sqrt{2} }{2}, \frac{ 3 \sqrt{2} }{2}, \frac{ 4 \sqrt{2} }{2} }.
+\end{equation}
+Back to $\mathbb{R}^6$, the Householder vector is
+\begin{equation}
+\rbr{ 0, -\frac{ 5 \sqrt{2} }{2}, 0, 0, \frac{ 3 \sqrt{2} }{2}, \frac{ 4 \sqrt{2} }{2} }.
+\end{equation}
+
+\textbf{Problem 3. (Page 98 Exercise 7)} \textit{Answer.} Here orthogonality yields
+\begin{equation}
+\alpha = \frac{\norm{x}}{\norm{y}}.
+\end{equation}
+We choose the Householder vector to be
+\begin{equation}
+v = \frac{ x - \alpha y }{\norm{ x - \alpha y }}.
+\end{equation}
+One may verify
+\begin{equation}
+\begin{split}
+&\ptrel{=} \rbr{ I - 2 v v^{\text{T}} } x \\
+&= \frac{ -x x^{\text{T}} x + 2 \alpha y x^{\text{T}} x - 2 \alpha^2 y x^{\text{T}} y + \alpha^2 x y^{\text{T}} y }{\norm{ x - \alpha y }^2} \\
+&= \frac{ 2 \alpha y x^{\text{T}} x - 2 \alpha^2 y x^{\text{T}} y }{\norm{ x - \alpha y }^2} \\
+&= \frac{ \alpha y x^{\text{T}} x - 2 \alpha^2 y x^{\text{T}} y + \alpha^3 y y^{\text{T}} y }{\norm{ x - \alpha y }^2} \\
+&= \alpha y.
+\end{split}
+\end{equation}
+
+\textbf{Problem 4. (Page 98 Exercise 8)} \textit{Answer.} The procedure is described as follows. We choose $H_k$ to be (one of) the Householder transform acting on the $ n + 1 - k $ and $ n + 1, \cdots, m $-th rows, such that the $ n + 1 - k $-th column of
+\begin{equation}
+H_{ k - 1 } \cdots H_1 L
+\end{equation}
+vanishes in $ n + 1, \cdots, m $-th rows. Note that the $ n + 1 - k $ and $ n + 1, \cdots, m $-th rows of the $ n + 1 - j $-th column (with $ j < k $) vanish identically, $H_k$ does not change this entries. As a result, The first $n$ rows are kept in a lower triangular shape, and the last $k$ rows of the last $ m - n $ rows are transformed out at the $k$-th step. In particular,
+\begin{equation}
+H_n \cdots H_1 L = \msbr{ L_1 \\ 0 },
+\end{equation}
+where $L_1$ is a $ n \times n $ lower triangular matrix, as desired.
+
+\textbf{Problem 5. (Page 98 Exercise 10)} \textit{Proof.} We have for any $b$,
+\begin{equation}
+A^{\text{T}} A X b = A^{\text{T}} b.
+\end{equation}
+This means
+\begin{equation}
+A^{\text{T}} A X = A^{\text{T}}.
+\end{equation}
+Since
+\begin{equation}
+A X = X^{\text{T}} A^{\text{T}} A X
+\end{equation}
+is symmetric,
+\begin{equation}
+\rbr{ A X }^{\text{T}} = A X
+\end{equation}
+and therefore
+\begin{equation}
+A = X^{\text{T}} A^{\text{T}} A = A X A.
+\end{equation}
+\hfill$\Box$
+
+\textbf{Problem 6. (Page 99 Exercise 12)} \textit{Proof.} Since
+\begin{equation}
+\norm{ A \rbr{ x + \alpha w } - b }_2^2 = \norm{ A x - b }_2^2 + 2 \alpha w^{\text{T}} A^{\text{T}} \rbr{ A x - b } + \alpha^2 \norm{ A w }_2^2,
+\end{equation}
+the $\alpha$ term must vanish or otherwise
+\begin{equation}
+\norm{ A \rbr{ x + \alpha w } - b }_2^2 \le \norm{ A x - b }_2^2
+\end{equation}
+for either $ \alpha \rightarrow 0^+ $ or $0^-$. This means
+\begin{equation}
+w^{\text{T}} A^{\text{T}} \rbr{ A x - b } = 0
+\end{equation}
+Since $w$ is arbitrary,
+\begin{equation}
+A^{\text{T}} \rbr{ A x - b } = 0
+\end{equation}
+or
+\begin{equation}
+A^{\text{T}} A x = A^{\text{T}} b.
+\end{equation}
+\hfill$\Box$
+
+\textbf{Problem 7. (Page 99 Coding Exercise (1))} \textit{Answer.} We solve the equation
+\begin{equation} \label{Eq:First}
+\msbr{ 6 & 1 & & & & \\ 8 & 6 & 1 & & & \\ & 8 & 6 & \ddots & & \\ & & \ddots & \ddots & \ddots & \\ & & & \ddots & 6 & 1 \\ & & & & 8 & 6 } x = \msbr{ 7 \\ 15 \\ 15 \\ \vdots \\ 15 \\ 14 }.
+\end{equation}
+The real solution is
+\begin{equation}
+x = \msbr{ 1 \\ 1 \\ 1 \\ \vdots \\ 1 \\ 1 }.
+\end{equation}
+The error between numerical solution $\hat{x}$ and the real solution $x$, $ \norm{ \hat{x} - x }_{\infty} $ is shown in Table \ref{Tbl:Non}.
+
+\begin{table}[htb]
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+$n$ & \verb"numpy.linalg.solve" & LU & Column LU & Full LU \\
+\hline
+\input{Table11.tbl}
+\end{tabular}
+\begin{tabular}{|c|c|c|}
+\hline
+$n$ & \verb"numpy.linalg.qr" & QR \\
+\hline
+\input{Table12.tbl}
+\end{tabular}
+\caption{Error of numerical solutions to \eqref{Eq:First}}
+\label{Tbl:Non}
+\end{table}
+
+From this table, pivoted LU decomposition behaves better than plain LU. Here QR factorization outperforms vanilla LU at some cases and vice versa. It should be noticed that the error of QR factorization are bounded above. The orthogonality from QR factorization and the matrix structure may accounts for this.
+
+We then solve the equation
+\begin{equation} \label{Eq:Second}
+\msbr{ 10 & 1 & & & & \\ 1 & 10 & 1 & & & \\ & 1 & 10 & \ddots & & \\ & & \ddots & \ddots & \ddots & \\ & & & \ddots & 10 & 1 \\ & & & & 1 & 10 } x = \msbr{ 10 & 1 & & & & \\ 1 & 10 & 1 & & & \\ & 1 & 10 & \ddots & & \\ & & \ddots & \ddots & \ddots & \\ & & & \ddots & 10 & 1 \\ & & & & 1 & 10 } x_{\text{rand}}
+\end{equation}
+where entries $x_{\text{rand}}$ are randomly generated from the standard normal distribution. The real solution is $ x = x_{\text{rand}} $. The error between numerical solution $\hat{x}$ and the real solution $x$, $ \norm{ \hat{x} - x }_{\infty} $ is shown in Table \ref{Tbl:Diag}.
+
+\begin{table}[htb]
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+$n$ & \verb"numpy.linalg.solve" & LU & Column LU & Full LU \\
+\hline
+\input{Table21.tbl}
+\end{tabular}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+$n$ & Cholesky & LDL\textsuperscript{T} & \verb"numpy.linalg.qr" & QR \\
+\hline
+\input{Table22.tbl}
+\end{tabular}
+\caption{Error of numerical solutions to \eqref{Eq:Second}}
+\label{Tbl:Diag}
+\end{table}
+
+Since the system is not so badly-conditioned (the condition number actually converges to $ 3 / 2 $), the solvers all behave well although some numerical rounding errors are introduced. Note that QR factorization methods seems to suffer from larger errors. The reason may be there are more complicated computation involved.
+
+We then solve the $ n \times n $ Hilbert matrix equation with real solution
+\begin{equation}
+x = \msbr{ 1 \\ 1 \\ 1 \\ \vdots \\ 1 \\ 1 }.
+\end{equation}
+The error between numerical solution $\hat{x}$ and the real solution $x$, $ \norm{ \hat{x} - x }_{\infty} $ is shown in Table \ref{Tbl:Hilbert}.
+
+\begin{table}[htb]
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+$n$ & \verb"numpy.linalg.solve" & LU & Column LU & Full LU \\
+\hline
+\input{Table31.tbl}
+\end{tabular}
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+$n$ & Cholesky & LDL\textsuperscript{T} & \verb"numpy.linalg.qr" & QR \\
+\hline
+\input{Table32.tbl}
+\end{tabular}
+\caption{Error of numerical solutions to the Hilbert matrix equation}
+\label{Tbl:Hilbert}
+\end{table}
+
+It can be seen from the table that QR factorization-based methods are slightly more stable than LU decomposition-based methods in some cases.
+
+\end{document}

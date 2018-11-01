@@ -10,13 +10,13 @@ import numpy
 import scipy.linalg
 import scipy.sparse
 import scipy.sparse.linalg
-import utils
+from utils import lu
 
 
 # In[2]:
 
 
-n_list = [5, 10, 15, 20, 30, 40, 50]
+n_list = [5, 10, 15, 20, 25, 30, 40, 50]
 
 
 # In[3]:
@@ -44,11 +44,11 @@ for n in n_list:
     
     run(lambda: numpy.linalg.solve(a, b), 0)
     
-    run(lambda: utils.solve_lu(a.copy(), b.copy()), 1)
+    run(lambda: lu.solve_lu(n, lu.fact_lu(n, a.copy()), b.copy()), 1)
     
-    run(lambda: utils.solve_chol(a.copy(), b.copy()), 2)
+    run(lambda: lu.solve_chol(n, lu.fact_chol(n, a.copy()), b.copy()), 2)
     
-    run(lambda: utils.solve_ldl(a.copy(), b.copy()), 3)
+    run(lambda: lu.solve_ldl(n, lu.fact_ldl(n, a.copy()), b.copy()), 3)
     
     print("n = {} finished".format(n))
 

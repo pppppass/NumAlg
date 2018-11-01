@@ -10,13 +10,12 @@
 *.thm
 *.run
 __pycache__/
+.*~/
 
 # Generated files
-*.pgf
-*.tbl
+*.pdf
 
 # Binary files
-*.pdf
 *.ipynb
 *.dat
 *.dir

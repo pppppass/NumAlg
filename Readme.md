@@ -14,7 +14,7 @@ There are several sub folders in this repository:
 
 ## Environment
 
-All the numerical results are all produced in a specific environment. The hardware configuration can be found in `hardware.txt`. An Anaconda environment is set up according to `environment.yml`.
+The numerical results are all produced in a specific environment. The hardware configuration can be found in `hardware.txt`. An Anaconda environment is set up according to `environment.yml`.
 
 ## Usage
 
@@ -27,8 +27,8 @@ To compile reports:
 4. The reports are `Answer.pdf` or `Report.pdf` in each folder.
 
 To reproduce the numerical results:
-1. Activate Anaconda and execute `make environment` in the root folder to create a new environment `numpde`;
-2. Activate the environment `numpde`;
+1. Activate Anaconda and execute `make environment` in the root folder to create a new environment `numalg`;
+2. Activate the environment `numalg`;
 3. Proceed down to a folder and execute `make run` to reproduce numerical results;
 4. Execute `make report` or `make` to regenerate the report;
 5. The numerical results are updated in the report, i.e., `Answer.pdf` or `Report.pdf`.

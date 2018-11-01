@@ -9,10 +9,26 @@ import shelve
 import numpy
 import scipy.sparse
 import scipy.sparse.linalg
-import utils
+from utils import lu
 
 
 # In[2]:
+
+
+def cvrt_list_csr(size, list_):
+    data, rows, cols = [], [], []
+    for v, x1, x2, y1, y2 in list_:
+        if 0 <= y1 < size and 0 <= y2 < size:
+            data.append(v)
+            rows.append(x1*size + x2)
+            cols.append(y1*size + y2)
+    mat = scipy.sparse.coo_matrix(
+        (data, (rows, cols)), shape=(size**2, size**2))
+    mat = mat.tocsr()
+    return mat
+
+
+# In[3]:
 
 
 def get_func(size):
@@ -24,7 +40,7 @@ def get_func(size):
     return f
 
 
-# In[3]:
+# In[4]:
 
 
 def get_sol(size):
@@ -36,10 +52,10 @@ def get_sol(size):
     return s
 
 
-# In[4]:
+# In[5]:
 
 
-def get_mat_sparse(size):
+def get_mat(size):
     n = size
     h = 1.0 / n
     l = []
@@ -50,17 +66,8 @@ def get_mat_sparse(size):
             l.append((-1.0, i, j, i, j+1))
             l.append((-1.0, i, j, i-1, j))
             l.append((-1.0, i, j, i+1, j))
-    a = utils.cvrt_list_to_csr(n-1, l)
+    a = cvrt_list_csr(n-1, l)
     a = a / h**2
-    return a
-
-
-# In[5]:
-
-
-def get_mat_dense(size):
-    a = get_mat_sparse(size)
-    a = a.todense().A
     return a
 
 
@@ -70,13 +77,13 @@ def get_mat_dense(size):
 n_list = [9, 19, 29, 39, 49, 59, 69, 79, 89, 99]
 
 
-# In[10]:
+# In[7]:
 
 
 rt = [[[], [], []], [[], [], []], [[], [], []], [[], [], []], [[], [], []], [[], [], []]]
 
 
-# In[11]:
+# In[10]:
 
 
 for n in n_list:
@@ -92,25 +99,25 @@ for n in n_list:
     f = get_func(n)
     s_ana = get_sol(n)
     
-    a = get_mat_sparse(n)
+    a = get_mat(n)
     s_eq = scipy.sparse.linalg.spsolve(a, f)
     run(lambda: scipy.sparse.linalg.spsolve(a, f), 0)
     
-    a = get_mat_dense(n)
+    a = a.todense().A
     run(lambda: numpy.linalg.solve(a, f), 1)
     
-    run(lambda: utils.solve_lu(a.copy(), f.copy()), 2)
+    run(lambda: lu.solve_lu((n-1)**2, lu.fact_lu((n-1)**2, a.copy()), f.copy()), 2)
     
-    run(lambda: utils.solve_chol(a.copy(), f.copy()), 3)
+    run(lambda: lu.solve_chol((n-1)**2, lu.fact_chol((n-1)**2, a.copy()), f.copy()), 3)
     
-    run(lambda: utils.solve_ldl(a.copy(), f.copy()), 4)
+    run(lambda: lu.solve_ldl((n-1)**2, lu.fact_ldl((n-1)**2, a.copy()), f.copy()), 4)
     
-    run(lambda: utils.solve_lu_band(a.copy(), f.copy(), (n, n)), 5)
+    run(lambda: lu.solve_lu_band((n-1)**2, lu.fact_lu_band((n-1)**2, a.copy(), (n, n)), f.copy(), (n, n)), 5)
     
     print("n = {} finished".format(n))
 
 
-# In[ ]:
+# In[9]:
 
 
 with shelve.open("Result") as db:

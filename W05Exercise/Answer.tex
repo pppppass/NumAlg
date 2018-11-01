@@ -1,0 +1,49 @@
+%! TeX encoding = UTF-8
+%! TeX program = LuaLaTeX
+
+\documentclass[english, nochinese]{pnote}
+\usepackage[paper]{pdef}
+
+\DeclareMathOperator\opfl{\mathrm{fl}}
+
+\title{Answers to Exercises (Week 05)}
+\author{Zhihan Li, 1600010653}
+\date{October 24, 2018}
+
+\begin{document}
+
+\maketitle
+
+\textbf{Problem 1. (Page 75 Coding Exercise (1))} \textit{Answer.} The estimated condition number and the calculated condition number from \verb"numpy.linalg.cond" of the $ n \times n $ Hilbert matrix is shown in Table \ref{Tbl:Hilbert}.
+
+\begin{table}[htb]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+$n$ & Estimated & \verb"numpy.linalg.cond" \\
+\hline
+\input{Table1.tbl}
+\end{tabular}
+\caption{Condition number of Hilbert matrices of different size $n$}
+\label{Tbl:Hilbert}
+\end{table}
+
+The estimated condition numbers coincide with the ones from \verb"numpy.linalg.cond" for small $n$, as shown in the numerical result. However, for large $n$, there are always some gaps. The failure in finding exact maximum may account for this. Another reason may be that \verb"numpy.linalg.cond" also suffers from huge numerical error because of the structure of very-badly-conditioned Hilbert matrices.
+
+\textbf{Problem 2. (Page 75 Coding Exercise (2))} \textit{Answer.} The estimated error $ \norm{ \hat{x} - x }_{\infty} $ and the result calculated from \verb"numpy.linalg.norm" are listed in Table \ref{Tbl:Err}.
+
+\begin{table}[htb]
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+$n$ & Estimated & \verb"numpy.linalg.norm" \\
+\hline
+\input{Table2.tbl}
+\end{tabular}
+\caption{Estimated error of the system of different size $n$}
+\label{Tbl:Err}
+\end{table}
+
+It can be seen from the table that the estimated error is constantly an upper bound of the real error. When $n$ is small, the estimated condition number is rather close to the real one and the estimation is more precise.
+
+\end{document}

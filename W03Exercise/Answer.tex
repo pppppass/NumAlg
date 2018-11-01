@@ -134,7 +134,7 @@ $N$ & \verb"spsolve" & \verb"solve" & LU & Cholesky & LDL\textsuperscript{T} & B
 
 From these results, we verify the convergence of the numerical discretization schemes as well as the validity of these linear system solvers.
 
-\textbf{Problem 5.} \textit{Answer.} We list the running time, $\ell^{\infty}$ and $\ell^2$ error between yielded and real solutions in Table \ref{Tbl:Time}, \ref{Tbl:ErrInfty} and \ref{Tbl:Err2} respectively. Here $n$ denotes the size of Hilbert matrix. We vary $n$ to explore the behavior of methods when the matrix gets more and more singular.
+\textbf{Problem 5. (Page 40 Coding Exercise (2))} \textit{Answer.} We list the running time, $\ell^{\infty}$ and $\ell^2$ error between yielded and real solutions in Table \ref{Tbl:Time}, \ref{Tbl:ErrInfty} and \ref{Tbl:Err2} respectively. Here $n$ denotes the size of Hilbert matrix. We vary $n$ to explore the behavior of methods when the matrix gets more and more singular.
 
 \begin{table}[htb]
 \centering
@@ -172,6 +172,6 @@ $n$ & \verb"solve" & LU & Cholesky & LDL\textsuperscript{T} \\
 \label{Tbl:Err2}
 \end{table}
 
-It can be seen that from these results that the three hand-written methods are slightly slower than packed solver \verb"solve" from NumPy. This is because Python is interpreted and hand-written codes takes noticeably much time than compiled ones. Since the Hilbert matrix is highly singular, all the yielded solutions suffer from enormous errors, which is caused by accumulation of tiny numerical rounding errors. Experimentally, LDL\textsuperscript{T} solver is slightly more stable than LU solver. However, Cholesky decomposition solver fails quickly because of the invalidity of square rooting: the diagonal entry happen to be negative at some time because of rounding error and then square rooting directly raises an error, which leads to Not A Number error eventually. The running time is too short to be comparable.
+It can be seen that from these results that the three hand-written methods are slightly slower than packed solver \verb"solve" from NumPy. This is because Python is interpreted and hand-written codes takes noticeably much time than compiled ones. Since the Hilbert matrix is highly singular, all the yielded solutions suffer from enormous errors, which is caused by accumulation of tiny numerical rounding errors. Experimentally, LDL\textsuperscript{T} solver is slightly more stable than LU solver. However, Cholesky decomposition solver fails quickly because of the invalidity of square rooting: the diagonal entry happens to be negative at some time because of rounding error and then square rooting directly raises an error, which leads to Not A Number error eventually. The running time is too short to be comparable.
 
 \end{document}

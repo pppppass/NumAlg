@@ -1,0 +1,59 @@
+%! TeX encoding = UTF-8
+%! TeX program = LuaLaTeX
+
+\documentclass[english, nochinese]{pnote}
+\usepackage[paper]{pdef}
+
+\title{Answers to Exercises (Week 08)}
+\author{Zhihan Li, 1600010653}
+\date{November 12, 2018}
+
+\begin{document}
+
+\maketitle
+
+\textbf{Problem.} \textit{Proof.} Denote $ A_{\epsilon} = D_{\epsilon} - L - L^{\text{T}} $ as in the textbook. Since the iteration scheme is linear, we take $ b = 0 $ without loss of generality. The rules of iterations are
+\begin{gather}
+x_{ k + 1 }^{\ast} = \rbr{ D_{\epsilon} - L }^{-1} L^{\text{T}} x_k, \\
+r_{ k + 1 } = -A_{\epsilon} x_{ k + 1 }^{\ast}, \\
+\alpha_{ k + 1 } = \frac{ v^{\text{T}} r_{ k + 1 } }{ v^{\text{T}} A_{\epsilon} v }, \\
+x_{ k + 1 } = x_{ k + 1 }^{\ast} + \alpha_{ k + 1 } v,
+\end{gather}
+where
+\begin{equation}
+v = \msbr{ 1 & 1 & 1 }^{\text{T}}
+\end{equation}
+is the eigenvector corresponding to the smallest eigenvalue $\epsilon$. The procedure of deriving $ x_{ k + 1 } $ from $ x_{ k + 1 }^{\ast} $ is actually
+\begin{equation}
+x_{ k + 1 } = P x_{ k + 1 }^{\ast},
+\end{equation}
+where $P$ is the orthogonal projection along $v$. The scheme is therefore
+\begin{equation}
+x_{ k + 1 } = P M_{\epsilon} x_k
+\end{equation}
+where
+\begin{equation}
+M_{\epsilon} = \rbr{ D_{\epsilon} - L }^{-1} L^{\text{T}}.
+\end{equation}
+
+We notice that
+\begin{equation}
+M_{\epsilon} = M_0 + O \rbr{\epsilon},
+\end{equation}
+and moreover $M_0$ has a single eigenvector $v$ for the eigenvalue $1$. This means
+\begin{equation}
+\rho \rbr{ P M_{\epsilon} } = \rho \rbr{ P M_0 } + O \rbr{\epsilon}.
+\end{equation}
+We claim
+\begin{equation}
+\rho \rbr{ P M_0 } < 1.
+\end{equation}
+This is because the kernel of $ I - M_0 $ is exactly spanned by $v$, which can be verified by direct calculation. For $ x \in \pbr{v} $, we immediately have $ P M_0 v = 0 $. For non-zero $ x \in \mathbb{R}^3 \setminus \pbr{v} $, we have $ \norm{x}_{A_0} > 0 $ and (according to previous exercises)
+\begin{equation}
+\norm{ P M_0 x }_{A_0}^2 \le \norm{ M_0 x }_{A_0}^2 = \norm{x}_{A_0}^2 - \norm{ x - M_0 x }_{D_0}^2 < \norm{x}_{A_0}^2.
+\end{equation}
+
+As a result, $ \rho \rbr{ P M_{\epsilon} } < 1 $ for sufficiently small $\epsilon$ and the convergence rate is independent of $\epsilon$ since $ \rho \rbr{ P M_{\epsilon} } \rightarrow \rho \rbr{ P M_0 } < 1 $.
+\hfill$\Box$
+
+\end{document}

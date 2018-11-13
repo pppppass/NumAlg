@@ -1,0 +1,98 @@
+%! TeX encoding = UTF-8
+%! TeX program = LuaLaTeX
+
+\documentclass[english, nochinese]{pnote}
+\usepackage[paper]{pdef}
+
+\title{Answers to Exercises (Week 07)}
+\author{Zhihan Li, 1600010653}
+\date{November 12, 2018}
+
+\begin{document}
+
+\maketitle
+
+\textbf{Problem 1. (Page 134 Exercise 1)} \textit{Proof.} For $A_1$, the iteration matrix for Jacobi iterations is
+\begin{equation}
+M_{\text{J}} = \msbr{ 2 & & \\ & 1 & \\ & & -2 }^{-1} \msbr{ & 1 & -1 \\ -1 & & -1 \\ -1 & -1 & } = \msbr{ & 1 / 2 & -1 / 2 \\ -1 & & -1 \\ 1 / 2 & 1 / 2 & }.
+\end{equation}
+Since $ \det \rbr{ \lambda I - M_{\text{J}} } = \lambda^3 + 5 / 4 \lambda $, $ \rho \rbr{M_{\text{J}}} = \sqrt{5} / 2 > 1 $ and Jacobi iterations diverge. The iteration matrix for Gauss--Seidel iterations is
+\begin{equation}
+M_{\text{GS}} = \msbr{ 2 & & \\ 1 & 1 & \\ 1 & 1 & -2 }^{-1} \msbr{ & 1 & -1 \\ & & -1 \\ & & } = \msbr{ & 1 / 2 & -1 / 2 \\ & -1 / 2 & -1 / 2 \\ & & -1 / 2 }.
+\end{equation}
+Eigenvalues of $M_{\text{GS}}$ are $ -1 / 2 $, $0$ and $ 1 / 2 $ and therefore $ \rho \rbr{M_{\text{GS}}} < 1 $. This means Gauss-Seidel iterations converge.
+
+For $A_2$, the iteration matrix for Jacobi iterations is
+\begin{equation}
+M_{\text{J}} = \msbr{ 1 & & \\ & 1 & \\ & & 1 }^{-1} \msbr{ & -2 & 2 \\ -1 & & -1 \\ -2 & -2 & } = \msbr{ & -2 & 2 \\ -1 & & -1 \\ -2 & -2 & }.
+\end{equation}
+Since $ \det \rbr{ \lambda I - M_{\text{J}} } = \lambda^3 $, we have $ \rho \rbr{ \lambda I - M_{\text{J}} } = 0 < 1 $ and therefore Jacobi iterations converge. Because
+\begin{equation}
+M_{\text{GS}} = \msbr{ 1 & & \\ 1 & 1 & \\ 2 & 2 & 1 }^{-1} \msbr{ & -2 & 2 \\ & & -1 \\ & & } = \msbr{ & -2 & 2 \\ & 2 & -3 \\ & & 2 }
+\end{equation}
+and its eigenvalues are $0$, $2$ and $2$ respectively, we have $ \rho \rbr{M_{\text{GS}}} > 1 $ and Gauss--Seidel iterations diverge.
+\hfill$\Box$
+
+\textbf{Problem 2. (Page 134 Exercise 2)} \textit{Proof.} Eigenvalues of $B$ is all zeros. According to the theory of Jordan canonical forms, $\mathbb{R}^n$ can be decomposed into $ V_1 \otimes V_2 \otimes \cdots \otimes V_k $, where $V_i$ is an cyclic (and therefore invariant) subspace of size $n_i$. Since the characteristic polynomial of $\nvbr{B}_{V_i}$ is $\lambda^{n_i}$ (because eigenvalues are all zeros), we deduce for $ \nvbr{B}_{V_i}^{n_i} = 0 $ and $ \nvbr{B}_{V_i}^n = 0 $. According to the direct sum decomposition, we have $ B^n = 0 $.
+
+Take the exact solution of $ x = B x + g $ to be $x^{\star}$, we have
+\begin{equation}
+x_{ k + 1 } - x^{\star} = B \rbr{ x_k - x^{\star} }.
+\end{equation}
+This implies
+\begin{equation}
+x_n - x^{\star} = B^n \rbr{ x_0 - x^{\star} } = 0
+\end{equation}
+and $ x_n = x^{\star} $.
+\hfill$\Box$
+
+\textbf{Problem 3. (Page 134 Problem 6)} \textit{Proof.} \textit{(Inspired by Zeyu Jia.)} Denote
+\begin{equation}
+r_i = \abs{a_{ i i }} - \sum_{\sarr{c}{ j = 1 \\ j \neq i }}^n {\abs{a_{ i j }}}.
+\end{equation}
+
+We prove the proposition by induction. When $ n = 1 $, the case is immediately done by
+\begin{equation}
+\text{LHS} = \abs{a_{ 1 1 }} = \text{RHS}.
+\end{equation}
+
+Suppose the case $ n = k - 1 $ and we proceed to check $ n = k $. Take $L$ to be the Gauss transformation which eliminates entries in the first column and the second to last rows. We have proved in previous exercises that the lower right $ \rbr{ n - 1 } \times \rbr{ n - 1 } $ block of $ L A $, say $ A_{ 2 2 } $, is still strictly diagonally dominant. To be exact, entries in that sub-matrix are
+\begin{equation}
+a_{ i j } - \frac{ a_{ i 1 } a_{ 1 j } }{a_{ 1 1 }}
+\end{equation}
+for $ 2 \le i, j \le n $. Apply the induction hypothesis on sub-matrix, we obtain
+\begin{equation}
+\abs{ \det A_{ 2 2 } } \ge \prod_{ i = 2 }^n \rbr{ \abs{ a_{ i i } - \frac{ a_{ i 1 } a_{ 1 i } }{a_{ 1 1 }} } - \sum_{\sarr{c}{ j = 2 \\ j \neq i }}^n \abs{ a_{ i j } - \frac{ a_{ i 1 } a_{ 1 j } }{a_{ 1 1 }} } } \ge \prod_{ i = 2 }^n \rbr{ r_i + \frac{a_{ i 1 }}{a_{ 1 1 }} r_1 }.
+\end{equation}
+As a result,
+\begin{equation}
+\abs{ \det A } = \abs{a_{ 1 1 }} \abs{ \det A_{ 2 2 } } \ge \abs{a_{ 1 1 }} \prod_{ i = 2 }^n \rbr{ r_i + \frac{a_{ i 1 }}{a_{ 1 1 }} r_1 } \ge \prod_{ i = 1 }^n r_i
+\end{equation}
+as desired.
+\hfill$\Box$
+
+\textbf{Problem 4. (Page 134 Problem 7)} \textit{Proof.} \textit{(Inspired by Zeyu Jia.)} Denote $ A = D - L - L^{\text{T}} $ as in the textbook. Without loss of generality we put in $ b = 0 $ here. The iteration formula is
+\begin{equation}
+x_{ k + 1 } = \rbr{ D - L }^{-1} L^{\text{T}} x_k.
+\end{equation}
+We claim that the $A$-norm of $x_k$ is decreasing. This is because
+\begin{equation}
+\begin{split}
+&\ptrel{=} x_k^{\text{T}} A x_k \\
+&= x_k^{\text{T}} \rbr{ D - L - L^{\text{T}} } x \\
+&= x_k^{\text{T}} D x_k - x_{ k + 1 }^{\text{T}} \rbr{ D - L^{\text{T}} } x_k - x_k^{\text{T}} \rbr{ D - L } x_{ k + 1 } \\
+&= x_k^{\text{T}} D x_k - x_{ k + 1 }^{\text{T}} D x_k - x_k^{\text{T}} D x_{ k + 1 } \\
+&+ x_{ k + 1 }^{\text{T}} \rbr{ D - L } x_{ k + 1 } + x_{ k + 1 }^{\text{T}} \rbr{ D - L^{\text{T}} } x_{ k + 1 } \\
+&= \rbr{ x_k - x_{ k + 1 } }^{\text{T}} D \rbr{ x_k - x_{ k + 1 } } + x_{ k + 1 }^{\text{T}} \rbr{ D - L - L^{\text{T}} } x_{ k + 1 } \\
+&\ge x_{ k + 1 }^{\text{T}} \rbr{ D - L - L^{\text{T}} } x_{ k + 1 } \\
+&= x_{ k + 1 }^{\text{T}} A x_{ k + 1 },
+\end{split}
+\end{equation}
+which the inequality relies on $D$ being positive. Since $ x_k \rightarrow x^{\star} = 0 $, which is the real solution, we deduce
+\begin{equation}
+x_0^{\text{T}} A x_0^{\text{T}} \ge \rbr{x^{\star}}^{\text{T}} A x^{\star} = 0.
+\end{equation}
+In what follows we knows that $A$ is positive definite because $A$ is non-singular and $x_0$ is arbitrary.
+\hfill$\Box$
+
+\end{document}

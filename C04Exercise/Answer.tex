@@ -1,0 +1,230 @@
+%! TeX encoding = UTF-8
+%! TeX program = LuaLaTeX
+
+\documentclass[english, nochinese]{pnote}
+\usepackage[paper]{pdef}
+
+\DeclareMathOperator\opim{\mathrm{Im}}
+
+\title{
+    Answers to Exercises (Week 10)}
+\author{Zhihan Li, 1600010653}
+\date{November 26, 2018}
+
+\begin{document}
+
+\maketitle
+
+The proofs are summarized from the materials given.
+
+\textbf{Problem 1.} \textit{Proof.} We take
+\begin{equation}
+I - B_{\text{P}} A = I - \rbr{ P_1 R_1 P_1^{\text{T}} + P_2 R_2 P_2^{\text{T}} + \cdots + P_N R_N P_N^{\text{T}} } A
+\end{equation}
+and
+\begin{equation}
+I - B_{\text{S}} A = \rbr{ I - P_N R_N P_N^{\text{T}} A } \rbr{ I - P_{ N - 1 } R_{ N - 1 } P_{ N - 1 }^{\text{T}} A } \cdots \rbr{ I - P_1 R_1 P_1^{\text{T}} A }.
+\end{equation}
+We define
+\begin{equation}
+P = \msbr{ P_1 & P_2 & \cdots & P_N }
+\end{equation}
+and further assume $P$ is sujective. We claim that
+\begin{equation} \label{Eq:MinThm}
+\pbr{ B_{\cdot}^{-1} u, u } = \min_{ u = P c } \pbr{ \tilde{B}_{\cdot}^{-1} c, c },
+\end{equation}
+if we have the decomposition
+\begin{equation}
+B_{\cdot}^{-1} = P \tilde{B}_{\cdot} P^{\text{T}}
+\end{equation}
+with $ \tilde{B}_{\cdot} \succ 0 $. This can be proved by observing
+\begin{equation}
+\begin{split}
+\text{LHS} &= \pbr{ \rbr{ P \tilde{B}_{\cdot} P^{\text{T}} }^{-1} P c, P c } \\
+&= \pbr{ \rbr{ \sqrt{\tilde{B}_{\cdot}} P^{\text{T}} \rbr{ P \tilde{B}_{\cdot} P^{\text{T}} }^{-1} P \sqrt{\tilde{B}_{\cdot}} } \sqrt{\tilde{B}_{\cdot}}^{-1} c, \sqrt{\tilde{B}_{\cdot}}^{-1} c } \\
+&\le \pbr{ \sqrt{\tilde{B}_{\cdot}}^{-1} c, \sqrt{\tilde{B}_{\cdot}}^{-1} c }
+\end{split}
+\end{equation}
+since
+\begin{equation}
+\sqrt{\tilde{B}_{\cdot}} P^{\text{T}} \rbr{ P \tilde{B}_{\cdot} P^{\text{T}} }^{-1} P \sqrt{\tilde{B}_{\cdot}}
+\end{equation}
+is an orthogonal projection and furthermore the minimum can be achieved.
+
+Denote
+\begin{equation}
+\tilde{A} = P^{\text{T}} A P
+\end{equation}
+and
+\begin{equation}
+\tilde{A}_{ i j } = P_i^{\text{T}} A P_j
+\end{equation}
+are blocks of $\tilde{A}$. Taking
+\begin{equation}
+R_i = \rbr{A_{ i i }}^{-1},
+\end{equation}
+one may directly verify
+\begin{equation}
+\tilde{B}_{\text{P}} = \tilde{D}^{-1}
+\end{equation}
+and
+\begin{equation}
+\tilde{B}_{\text{S}} = \rbr{ \tilde{D} - \tilde{L} }^{-1},
+\end{equation}
+where $ \tilde{A} = \tilde{D} - \tilde{L} - \tilde{U} $ stands for the diagonal part, lower-triangular part and upper-triangular part of $\tilde{A}$ with respect to blocks $ \tilde{A}_{ i j } $. The intuition of this decomposition is that $B_{\text{P}}$ and $B_{\text{S}}$ corresponds to Jacobian and Gauss--Seidel iterations in the space of $c$. Furthermore, we may observe
+\begin{equation}
+\tilde{\overline{B_{\text{S}}}} = \tilde{B}_{\text{S}} + \tilde{B}_{\text{S}} - \tilde{B}_{\text{S}}^{\text{T}} \tilde{A} \tilde{B}_{\text{S}} = \rbr{ \tilde{D} - \tilde{U} }^{-1} \tilde{D} \rbr{ \tilde{D} - \tilde{L} }^{-1}.
+\end{equation}
+
+Following \eqref{Eq:MinThm}, we derive
+\begin{equation} \label{Eq:EqP}
+\pbr{ B_{\text{P}}^{-1} u, u } = \min_{ u = P c } \pbr{ \tilde{B}_{\text{P}}^{-1} c, c } = \min_{ u = P c } \pbr{ \tilde{D} c, c } = \min_{ u = P c } \sum_{ i = 1 }^N \norm{ P_i c_i }_A^2.
+\end{equation}
+Moreover,
+\begin{equation} \label{Eq:EqS}
+\begin{split}
+\pbr{ \overline{B_{\text{S}}}^{-1} u, u } &= \min_{ u = P c } \pbr{ \tilde{\overline{B_{\text{S}}}}^{-1} c, c } \\
+&= \min_{ u = P c } \pbr{ \rbr{ \tilde{D} - \tilde{L} } \tilde{D}^{-1} \rbr{ \tilde{D} - \tilde{U} } c, c } \\
+&= \min_{ u = P c } \sum_{ i = 1 }^N \pbr{ \rbr{ P_i^{\text{T}} A P_i }^{-1} P_i^{\text{T}} A \sum_{ j = i }^N P_i c_i, P_i^{\text{T}} A \sum_{ j = i }^N P_i c_i } \\
+&= \min_{ u = P c } \sum_{ i = 1 }^N \pbr{ Q_i \sum_{ j = i }^N P_i c_i, \sum_{ j = i }^N P_i c_i }_A \\
+&= \min_{ u = P c } \sum_{ i = 1 }^N \norm{ Q_i \sum_{ j = i }^N P_i c_i }_A^2,
+\end{split}
+\end{equation}
+where
+\begin{equation}
+Q_i = P_i \rbr{ P_i^{\text{T}} A P_i }^{-1} P_i^{\text{T}} A
+\end{equation}
+is the orthogonal projection towards $ V_i = \opim P_i $ with respect to the inner product $ \pbr{ \cdot, \cdot }_A $.
+
+For any $c$, we have
+\begin{equation}
+\begin{split}
+\sum_{ i = 1 }^N \norm{ P_i c_i }_A^2 &\le 2 \sum_{ i = 1 }^N \rbr{ P_i c_i, \sum_{ j = i }^N P_j c_j }_A \\
+&= 2 \sum_{ i = 1 }^N \rbr{ P_i c_i, Q_i \sum_{ j = 1 }^N P_j c_j }_A \\
+&\le 2 \sqrt{ \sum_{ i = 1 }^N \norm{ P_i c_i }_A^2 } \sqrt{ \sum_{ i = 1 }^N \norm{ Q_i \sum_{ j = i }^N P_j c_j }_A^2 }
+\end{split}
+\end{equation}
+and therefore
+\begin{equation}
+\sum_{ i = 1 }^N \norm{ P_i c_i }_A^2 \le 4 \sum_{ i = 1 }^N \norm{ Q_i \sum_{ j = i }^N P_j c_j }_A^2.
+\end{equation}
+By \eqref{Eq:EqP} and \eqref{Eq:EqS}, we have
+\begin{equation}
+\pbr{ B_{\text{P}}^{-1} u, u } \le 4 \pbr{ \overline{B_{\text{S}}}^{-1} u, u }.
+\end{equation}
+
+Denote
+\begin{equation}
+N \rbr{i} = \cbr{ j : V_i \not \perp_A V_j }
+\end{equation}
+and
+\begin{equation}
+C = \max_i \abs{ N \rbr{i} }^2.
+\end{equation}
+We have
+\begin{equation}
+\begin{split}
+&\ptrel{=} \sum_{ i = 1 }^N \norm{ Q_i \sum_{ j = i }^N P_j c_j }_A^2 \\
+&= \sum_{ i = 1 }^N \norm{ Q_i \sum_{\sarr{c}{ j = i \\ j \in N \rbr{i} }}^N P_j c_j }_A^2 = \sum_{ i = 1 }^N \norm{ \sum_{\sarr{c}{ j = i \\ j \in N \rbr{i} }}^N P_j c_j }_A^2 \\
+&\le \sum_{ i = 1 }^N \abs{ N \rbr{i} } \sum_{\sarr{c}{ j = i \\ j \in N \rbr{i} }}^N \norm{ P_j c_j }_A^2 \le C \sum_{ i = 1 }^N \norm{ P_i c_i }_A^2
+\end{split}
+\end{equation}
+and therefore
+\begin{equation}
+\pbr{ \overline{B_{\text{S}}}^{-1} u, u } \le C \pbr{ B_{\text{P}}^{-1} u, u }.
+\end{equation}
+
+We should note that the definition of $N$ here requires $ V_i \not\perp_A V_j $ instead of $ V_i \cap V_j \neq \cbr{0} $. A counter example for the original definition is described as follows. We take the space to be $\mathbb{R}^2$ and $ A = I $,
+\begin{gather}
+P_1 = \msbr{ 1 \\ 0 } \\
+P_2 = \msbr{ 1 / 2 \\ \sqrt{3} / 2 } \\.
+\end{gather}
+We choose
+\begin{equation}
+u = \msbr{ 3 / 2 \\ \sqrt{3} / 2 },
+\end{equation}
+one may calculate directly
+\begin{equation}
+\pbr{ \overline{B}_{\text{S}}^{-1} u, u } = \frac{13}{4}
+\end{equation}
+while
+\begin{equation}
+\pbr{ B_{\text{P}}^{-1} u, u } = 2.
+\end{equation}
+This means $C$ has to be greater than $2$, but $ V_1 \cap V_2 = \cbr{0} $ here.
+\hfill$\Box$
+
+\textbf{Problem 2.} \textit{Proof.} We assume $A$ and $R$ are non-singular here. Denote $ W = \opim P $ and
+\begin{equation}
+E = \rbr{ 1 - T } \rbr{ 1 - \Pi },
+\end{equation}
+where
+\begin{gather}
+T = R A, \\
+\Pi = P \rbr{ P^{\text{T}} A P }^{-1} P^{\text{T}} A.
+\end{gather}
+Assume
+\begin{equation}
+\overline{R} = R + R^{\text{T}} - R^{\text{T}} A R
+\end{equation}
+and $ \overline{T} = \overline{R} A $. One may verify
+\begin{equation}
+\norm{ \rbr{ I - T } v }_A^2 = \pbr{ \rbr{ I - \overline{T} } v, v }_A
+\end{equation}
+directly. We further assume $ \overline{R} \succ 0 $. This leads to
+\begin{equation}
+\pbr{ \overline{T}^{-1} u, v }_A = \pbr{ u, v }_{\overline{R}^{-1}}.
+\end{equation}
+Let
+\begin{equation}
+Q = P \rbr{ P^{\text{T}} \overline{R}^{-1} P }^{-1} P^{\text{T}} \overline{R}^{-1},
+\end{equation}
+namely the orthogonal projection with respect to $\overline{R}$. We proceed to prove
+\begin{equation}
+\norm{E}_A = 1 - \frac{1}{K}
+\end{equation}
+where
+\begin{equation}
+K = \max_v \frac{\norm{ \rbr{ I - Q } v  }_{\overline{R}^{-1}}^2}{\norm{v}_A^2} = \max_v \min_c \frac{\norm{ v - P c  }_{\overline{R}^{-1}}^2}{\norm{v}_A^2}.
+\end{equation}
+
+We have
+\begin{equation}
+\begin{split}
+\norm{E}_A^2 &= \max_v \frac{\norm{ \rbr{ I - T } \rbr{ I - \Pi } v }_A^2}{\norm{v}_A^2} \\
+&= \max_v \frac{ \pbr{ \rbr{ I - \overline{T} } \rbr{ I - \Pi } v, \rbr{ I - \Pi } v }_A}{ \norm{ \rbr{ I - \Pi } v }_A^2 + \norm{ \Pi v }_A^2 } \\
+&= \max_{ v \in W^{\perp_A} } \frac{ \pbr{ \rbr{ I - \overline{T} } v, v }_A}{\norm{v}_A^2} \\
+&= 1 - \min_{ v \in W^{\perp_A} } \frac{\pbr{ \overline{T} v, v }_A}{\norm{v}_A^2} \\
+&= 1 - \min_{ v \in W^{\perp_A} } \frac{\rbr{ \rbr{ 1 - \Pi } \overline{T} v, v }_A}{\norm{v}_A^2} \\
+&= 1 - \lambda_{\text{min}} \rbr{ \rbr{ I - \Pi } \overline{T} },
+\end{split}
+\end{equation}
+where $\lambda_{\text{min}}$ is evaluated with respecto to $W^{\perp_A}$. Since $ \rbr{ I - \Pi } \overline{T} $ can be restricted into $ W^{\perp_A} \rightarrow W^{\perp_A} $, one may observe its inverse on $W^{\perp_A}$ can be explicitly written as
+\begin{equation}
+\overline{T}^{-1} \rbr{ I - Q }.
+\end{equation}
+This is because
+\begin{equation}
+\pbr{ \overline{T}^{-1} \rbr{ I - Q } u, \Pi v }_A = \pbr{ \rbr{ I - Q } u, \Pi v }_{\overline{R}^{-1}} = 0
+\end{equation}
+and
+\begin{equation}
+\rbr{ \rbr{ I - \Pi } \overline{T} } \rbr{ \overline{T}^{-1} \rbr{ I - Q } } = \rbr{ I - \Pi } \rbr{ I - Q } = \rbr{ I - \Pi } = I
+\end{equation}
+on $W^{\perp_A}$, where the second equality follows from $ \Pi Q = Q $. Since
+\begin{equation}
+\begin{split}
+\lambda_{\text{max}} \rbr{ \overline{T}^{-1} \rbr{ I - Q } } &= \max_{ v \in W^{\perp_A} } \frac{\pbr{ \overline{T}^{-1} \rbr{ I - Q } v, v }_A}{\norm{v}_A^2} \\
+&= \max_{ v \in W^{\perp_A} } \frac{\pbr{\rbr{ I - Q } v, v }_{\overline{R}^{-1}}}{\norm{v}_A^2} \\
+&= \max_{ v \in W^{\perp_A} } \frac{\pbr{\rbr{ I - Q } v, v }_{\overline{R}^{-1}}}{\norm{v}_A^2} \\
+&= \max_{ v \in W^{\perp_A} } \frac{\norm{ \rbr{ I - Q } v }_{\overline{R}^{-1}}^2}{\norm{v}_A^2} \\
+&= K,
+\end{split}
+\end{equation}
+we deduce
+\begin{equation}
+\norm{E}_A = 1 - \lambda_{\text{min}} \rbr{ \rbr{ I - \Pi } \overline{T} } = 1 - \frac{1}{ \lambda_{\text{max}} \rbr{ \overline{T}^{-1} \rbr{ I - Q } } } = 1 - \frac{1}{K}.
+\end{equation}
+\hfill$\Box$
+
+\end{document}

@@ -1,0 +1,227 @@
+%! TeX encoding = UTF-8
+%! TeX program = LuaLaTeX
+
+\documentclass[english, nochinese]{pnote}
+\usepackage[paper]{pdef}
+
+\DeclareMathOperator\opdiag{\mathrm{diag}}
+
+\title{Answers to Exercises (Chapter 6)}
+\author{Zhihan Li, 1600010653}
+\date{December 10, 2018}
+
+\begin{document}
+
+\maketitle
+
+\textbf{Problem 1. (Page 196 Exercise 2)} \textit{Proof.} Since $ \norm{Q_k}_2 \le 1 $ and the set of $ n \times n $ matrices is finite-dimensional, we may extract a convergent sub-sequence $Q_{k_i}$. Since for $ 1 \le v < u \le n $ we have
+\begin{equation}
+\rbr{ Q^{\ast} A Q }_{ u, v } = \lim_{ i \rightarrow \infty } \rbr{ Q_{k_i}^{\ast} A_{k_i} Q_{k_i} }_{ u, v } = \lim_{ i \rightarrow \infty } \rbr{T_{k_i}}_{ u, v } = 0,
+\end{equation}
+$ Q^{\ast} A Q $ is therefore upper-triangular.
+\hfill$\Box$
+
+\textbf{Problem 2. (Page 196 Exercise 3)} \textit{Proof.} Denote
+\begin{equation}
+S = Q^{\ast} B Q.
+\end{equation}
+From $ A B = B A $, we deduce
+\begin{equation}
+T S = S T.
+\end{equation}
+Since $A$ has no repeated eigenvalues, the diagonal entries of $T$ differ from each other. Split the matrices as blocks by separating the first row (column) and the other rows (columns). We have
+\begin{equation}
+\msbr{ t_{ 1 1 } & T_{ 1 2 } \\ & T_{ 2 2 } } \msbr{ \ast & \ast \\ S_{ 2 1 } & S_{ 2 2 } } = \msbr{ \ast & \ast \\ S_{ 2 1 } & S_{ 2 2 } } \msbr{ t_{ 1 1 } & T_{ 1 2 } \\ & T_{ 2 2 } }
+\end{equation}
+and this lead to the equation of $ \rbr{ 2, 1 } $ block is
+\begin{equation}
+T_{ 2 2 } S_{ 2 1 } = t_{ 1 1 } S_{ 2 1 }.
+\end{equation}
+However, because $ t_{ 1 1 } $ is not an eigenvalue of $ T_{ 2 2 } $, it leaves that $ S_{ 2 1 } = 0 $ and the equation of $ \rbr{ 2, 2 } $ block boils down to
+\begin{equation}
+T_{ 2 2 } S_{ 2 2 } = S_{ 2 2 } T_{ 2 2 }.
+\end{equation}
+By mathematical induction, we can prove that $S$ itself is upper-triangular.
+\hfill$\Box$
+
+\textbf{Problem 3. (Page 196 Exercise 5)} \textit{Proof.} The normalized right eigenvector of eigenvalue $\alpha$ is
+\begin{equation}
+x_{\alpha} = \msbr{ 1 \\ 0 },
+\end{equation}
+and the corresponding left eigenvector is
+\begin{equation}
+y_{\alpha} = \frac{1}{ \alpha - \beta } \msbr{ \gamma & \alpha - \beta }
+\end{equation}
+such that $ y_{\alpha}^{\text{T}} x_{\alpha} = 1 $. As a result, the condition number of $\alpha$ is
+\begin{equation}
+\norm{y_{\alpha}}_2 = \frac{\sqrt{ \gamma^2 + \rbr{ \alpha - \beta }^2 }}{\abs{ \alpha - \beta }}.
+\end{equation}
+For $\beta$, we have
+\begin{equation}
+x_{\beta} = \frac{1}{\sqrt{ \gamma^2 + \rbr{ \beta - \alpha }^2}} \msbr{ \gamma & \beta - \alpha }
+\end{equation}
+and
+\begin{equation}
+y_{\beta} = \frac{1}{ \beta - \alpha } \msbr{ 0 & \sqrt{ \gamma^2 + \rbr{ \beta - \alpha }^2 } }.
+\end{equation}
+The condition number of $\beta$ is
+\begin{equation}
+\norm{y_{\beta}}_2 = \frac{\sqrt{ \gamma^2 + \rbr{ \beta - \alpha }^2 }}{\abs{ \beta - \alpha }}.
+\end{equation}
+
+\textbf{Problem 4. (Page 196 Exercise 12)} \textit{Proof.} We have
+\begin{equation}
+\lambda v = A v + u,
+\end{equation}
+and therefore we only need to impose $ E v = u $. A construction of $E$ is thereby
+\begin{equation}
+E = \frac{1}{\norm{v}_2^2} u v^{\text{T}}.
+\end{equation}
+Here
+\begin{equation}
+\norm{E}_{\text{F}} = \frac{1}{\norm{v}_2^2} \norm{u}_2 \norm{v}_2 = \frac{\norm{u}_2}{\norm{v}_2}
+\end{equation}
+as desired.
+\hfill$\Box$
+
+\textbf{Problem 5. (Page 196 Exercise 14)} \textit{Answer.} We have
+\begin{gather}
+A_0 = \msbr{ 1 & 0 \\ 1 & -1 } = \msbr{ 1 / \sqrt{2} & 1 / \sqrt{2} \\ 1 / \sqrt{2} & -1 / \sqrt{2} } \msbr{ \sqrt{2} & -1 / \sqrt{2} \\ & 1 / \sqrt{2} }, \\
+\begin{split}
+A_1 &= \msbr{ \sqrt{2} & -1 / \sqrt{2} \\ & 1 / \sqrt{2} } \msbr{ 1 / \sqrt{2} & 1 / \sqrt{2} \\ 1 / \sqrt{2} & -1 / \sqrt{2} } \\
+&= \msbr{ 1 / 2 & 3 / 2 \\ 1 / 2 & -1 / 2 } \\
+&= \msbr{ 1 / \sqrt{2} & 1 / \sqrt{2} \\ 1 / \sqrt{2} & -1 / \sqrt{2} } \msbr{ 1 / \sqrt{2} & 1 / \sqrt{2} \\ & \sqrt{2} }
+\end{split}
+\\
+A_2 = \msbr{ 1 / \sqrt{2} & 1 / \sqrt{2} \\ & \sqrt{2} } \msbr{ 1 / \sqrt{2} & 1 / \sqrt{2} \\ 1 / \sqrt{2} & -1 / \sqrt{2} } = \msbr{ 1 & 0 \\ 1 & -1 } = A_0
+\end{gather}
+and $A_k$ gets repeated with period $2$. Obviously $A_k$ is not convergent, but there exists a convergent sub-sequence. The lower-triangular part of $A_k$ does not vanish asymptotically. One reason may be that the eigenvalues have identical magnitude.
+
+\textbf{Problem 6. (Page 198 Exercise 19)} \textit{Proof.} Denote
+\begin{equation}
+D = \opdiag \rbr{ d_1, d_2, \cdots, d_n }.
+\end{equation}
+The first sub-diagonal of $ D^{-1} H D $ is composed of
+\begin{equation}
+\frac{d_1}{d_2} a_{ 2, 1 }, \frac{d_2}{d_3} a_{ 3, 2 }, \cdots, \frac{d_{ n - 1 }}{d_n} a_{ \rbr{ n - 1 }, n }
+\end{equation}
+As a result, we can set
+\begin{equation}
+d_k = \prod_{ i = 1 }^{ k - 1 } a_{ i + 1, i }.
+\end{equation}
+The condition number
+\begin{equation}
+\kappa_2 \rbr{D} = \frac{ \max_k \prod_{ i = 1 }^{ k - 1 } \abs{a_{ i + 1, i }} }{ \min_k \prod_{ i = 1 }^{ k - 1 } \abs{a_{ i + 1, i }} }.
+\end{equation}
+\hfill$\Box$
+
+\textbf{Problem 7. (Page 198 Exercise 22)} \textit{Proof.} We have
+\begin{equation}
+\begin{split}
+H_{ k + 1 } &= R_k U_k + \mu_k I = R_k \rbr{ U_k R_k } R_k^{-1} + \mu_k I \\
+&= R_k \rbr{ H_k - \mu_k I } R_k^{-1} + \mu_k I = R_k H_k R_k^{-1}.
+\end{split}
+\end{equation}
+This means
+\begin{equation} \label{Eq:Conj}
+\begin{split}
+&\ptrel{=} R_0^{-1} R_1^{-1} \cdots R_k^{-1} U_{ k + 1 } R_{ k + 1 } R_k R_{ k - 1 } \cdots R_0 \\
+&= R_0^{-1} R_1^{-1} \cdots R_k^{-1} \rbr{ H_{ k + 1 } - \mu_{ k + 1 } I } R_k R_{ k - 1 } \cdots R_0 \\
+&= H - \mu_{ k + 1 } I.
+\end{split}
+\end{equation}
+Multiply \eqref{Eq:Conj} with $ k = 0, 1, \cdots, j $, we immediately obtain
+\begin{equation}
+U_0 U_1 \cdots U_j R_j R_{ j - 1 } \cdots R_0 = \rbr{ H - \mu_0 I } \rbr{ H - \mu_1 I } \cdots \rbr{ H - \mu_j I }.
+\end{equation}
+\hfill$\Box$
+
+\textbf{Problem 8. (Page 200 Exercise 32)} \textit{Proof.} (1). This immediately follows from block-wise multiplication and
+\begin{equation}
+q_k^{\ast} A q_k = \mu_k.
+\end{equation}
+
+(2). We have
+\begin{equation}
+\rho = \norm{ A q_k - \mu_k q_k }_2 = \norm{ Q_k^{\ast} A q_k - \mu_k Q_k^{\ast} q_k }_2 = \norm{ \msbr{ \mu_k \\ g_k } - \msbr{ \mu_k \\ 0 } }_2 = \norm{g_k}_2.
+\end{equation}
+
+(3). Since
+\begin{equation}
+Q_{ k - 1 }^{\ast} \rbr{ A - \mu_{ k - 1 } I } Q_{ k - 1 } \msbr{ 1 \\ y_k } = \msbr{ 0 & h_{ k - 1 }^{\ast} \\ g_{ k - 1 } & C_{ k - 1 } - \mu_{ k - 1 } I } \msbr{ 1 \\ y_k } = \msbr{ \ast \\ 0 },
+\end{equation}
+by $ q_k \neq 0 $, we obtain there exists non-zero $c_k$ such that
+\begin{equation}
+Q_{ k - 1 }^{\ast} \rbr{ A - \mu_{ k - 1 } I } Q_{ k - 1 } \msbr{ 1 \\ y_k } = \msbr{ c_k \\ 0 } = c_k Q_{ k - 1 }^{\ast} q_{ k - 1 }
+\end{equation}
+and therefore
+\begin{equation}
+Q_{ k - 1 } \msbr{ 1 \\ y_k } = c_k \rbr{ A - \mu_{ k - 1 } I }^{-1} q_{ k - 1 } = c_k z_k.
+\end{equation}
+Because
+\begin{equation}
+\norm{ Q_{ k - 1 } \msbr{ 1 \\ y_k } }_2 = \norm{\msbr{ 1 \\ y_k }}_2 = \delta_k,
+\end{equation}
+\begin{equation}
+q_k = \frac{1}{\delta_k} \norm{ Q_{ k - 1 } \msbr{ 1 \\ y_k } }_2
+\end{equation}
+follows immediately.
+
+(4). Since $ I + y_k y_k^{\ast} $ is positive definite, the existence of $D$ follows directly by
+\begin{equation}
+D = \rbr{ I + y_k y_k^{\ast} }^{ -1 / 2 }.
+\end{equation}
+We may first extract a convergent sequence of $q_k$ (since they are bounded) and we still denote it $q_k$. From the assumption $ \rho_k \rightarrow 0 $, in what follows is $\mu_k$ converges to a eigenvalue $\mu$. We need to further assume $A$ has \emph{no} repeated eigenvalue. In this case,
+\begin{equation}
+\norm{ \rbr{ \mu_k^{\ast} I - C_k^{\ast} }^{-1} \rbr{ \mu_k I - C_k }^{-1} }_2 = \rho \rbr{ \rbr{ \mu_k^{\ast} I - C_k^{\ast} }^{-1} \rbr{ \mu_k I - C_k }^{-1} }
+\end{equation}
+is bounded because $ g_k \rightarrow 0 $ and there exists a neighborhood of $\mu$ which $A$ has no other eigenvalues in. As a result,
+\begin{equation}
+\norm{y_k}_2 = O \rbr{\norm{g_k}_2},
+\end{equation}
+and
+\begin{equation}
+\norm{ y_k y_k^{\ast} }_{\text{F}} = \norm{y_k}_2^2 = O \rbr{\norm{g_k}_2^2}.
+\end{equation}
+This implies
+\begin{equation}
+D = I + O \rbr{\norm{g_{ k - 1 }}_2^2}.
+\end{equation}
+
+(5). We have verified the first column in (3). Since the choice of $U_k$ enjoys some freedom, it remains to prove $Q_k$ is itself unitary. This can be seen from
+\begin{equation}
+\begin{split}
+Q_k^{\ast} Q_k &= \msbr{ \delta_k^{-1} & \\ & D^{\ast} } \msbr{ 1 & y_k^{\ast} \\ -y_k & I } Q_{ k - 1 }^{\ast} Q_{ k - 1 } \msbr{ 1 & -y_k^{\ast} \\ y_k & I } \msbr{ \delta_k^{-1} & \\ & D } \\
+&= \msbr{ \delta_k^{-1} & \\ & D^{\ast} } \msbr{ 1 & y_k^{\ast} \\ -y_k & I } \msbr{ 1 & -y_k^{\ast} \\ y_k & I } \msbr{ \delta_k^{-1} & \\ & D } \\
+&= \msbr{ \delta_k^{-1} & \\ & D^{\ast} } \msbr{ \delta_k^2 & \\ & I + y_k y_k^{\ast} } \msbr{ \delta_k^{-1} & \\ & D } \\
+&= I.
+\end{split}
+\end{equation}
+
+(6). From
+\begin{equation}
+Q_k^{\ast} A Q_k = \msbr{ \delta_k^{-1} & \\ & D^{\ast} } \msbr{ 1 & y_k^{\ast} \\ -y_k & I } Q_{ k - 1 }^{\ast} A Q_{ k - 1 } \msbr{ 1 & -y_k^{\ast} \\ y_k & I } \msbr{ \delta_k^{-1} & \\ & D },
+\end{equation}
+the $ \rbr{ 2, 1 } $ block gives
+\begin{equation}
+g_k = \frac{1}{\delta_k^{-1}} \rbr{ -\mu_{ k - 1 } y_k - y_k h_{ k - 1 }^{\ast} y_k + g_{ k - 1 } + C_{ k - 1 } y_k } D = -\frac{1}{\delta_k} \rbr{ h_{ k - 1 }^{\ast} y_k } y_k D.
+\end{equation}
+From (5), and $ \norm{y_k}_2 = O \rbr{\norm{g_{ k - 1}}_2} $,
+\begin{equation}
+g_k = -\frac{1}{\delta_k} \rbr{ h_{ k - 1 }^{\ast} y_k } y_k + \frac{1}{\delta_k} \rbr{ h_{ k - 1 }^{\ast} y_k } y_k O \rbr{\norm{g_{ k - 1 }}_2^2} = -\frac{1}{\delta_k} \rbr{ h_{ k - 1 }^{\ast} y_k } y_k + O \rbr{\norm{g_{ k - 1 }}_2^4}.
+\end{equation}
+
+(7). Since $h_k^{\ast}$ is bounded, and $ \norm{y_k}_2 = O \rbr{\norm{g_{ k - 1 }}_2} $, we obtain
+\begin{equation}
+\norm{g_k}_2 = O \rbr{\norm{g_{ k - 1 }}_2^2}.
+\end{equation}
+If $A$ is Hermitian, $ h_k = g_k $ and therefore
+\begin{equation}
+\norm{ \frac{1}{\delta_k} \rbr{ h_{ k - 1 }^{\ast} y_k } y_k }_2 = O \rbr{\norm{g_{ k - 1 }}_2^3}
+\end{equation}
+and
+\begin{equation}
+\norm{g_k}_2 = O \rbr{\norm{g_k}_2^3}.
+\end{equation}
+
+\end{document}

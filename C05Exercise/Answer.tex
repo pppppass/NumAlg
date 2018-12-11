@@ -1,0 +1,101 @@
+%! TeX encoding = UTF-8
+%! TeX program = LuaLaTeX
+
+\documentclass[english, nochinese]{pnote}
+\usepackage[paper]{pdef}
+
+\title{Answers to Exercises (Chapter 5)}
+\author{Zhihan Li, 1600010653}
+\date{December 10, 2018}
+
+\begin{document}
+
+\maketitle
+
+\textbf{Problem 1. (Page 158 Exercise 1)} \textit{Proof.} We have
+\begin{equation}
+\begin{split}
+\phi \rbr{x} + x_{\ast}^{\text{T}} A x_{\ast} &= x^{\text{T}} A x - 2 b^{\text{T}} x + x_{\ast}^{\text{T}} A x_{\ast} \\
+&= x^{\text{T}} A x - 2 x_{\ast}^{\text{T}} A x + x_{\ast}^{\text{T}} A x_{\ast} \\
+&= \rbr{ x - x_{\ast} }^{\text{T}} A \rbr{ x - x_{\ast} }.
+\end{split}
+\end{equation}
+\hfill$\Box$
+
+\textbf{Problem 2. (Page 158 Exercise 3)} \textit{Proof.} We have
+\begin{equation}
+x^{\rbr{ k + 1 }} = x^{\rbr{k}} + \alpha \rbr{ r - A x^{\rbr{k}} }
+\end{equation}
+and
+\begin{equation}
+b - A x^{\rbr{ k + 1 }} = 0.
+\end{equation}
+This implies
+\begin{equation}
+b - A x^{\rbr{k}} = \alpha A \rbr{ b - A x^{\rbr{k}} }.
+\end{equation}
+\hfill$\Box$
+
+\textbf{Problem 3. (Page 158 Exercise 6)} \textit{Proof.} We have
+\begin{equation}
+\begin{split}
+\phi \rbr{ y_{ i - 1 } + t e_i } &= \rbr{ y_{ i - 1 } + t e_i }^{\text{T}} A \rbr{ y_{ i - 1 } + t e_i } - 2 b^{\text{T}} \rbr{ y_{ i - 1 } + t e_i } \\
+&= e_i^{\text{T}} A e_i t^2 + 2 \rbr{ e_i^{\text{T}} A y_{ i - 1 } - 2 e_i^{\text{T}} b } t + \text{const}
+\end{split}
+\end{equation}
+and therefore the $t$ for the $i$-th sub-step satisfies
+\begin{equation}
+A_{ i i } t + \rbr{ A y_{ i - 1 } }_i = b_i
+\end{equation}
+or
+\begin{equation}
+\rbr{ A \rbr{ y_{ i - 1 } + t e_i } }_i = b_i.
+\end{equation}
+This is exactly the condition we impose for the $i$-th sub-step in Gauss-Seidel iterations, say
+\begin{equation}
+\rbr{ A y_i }_i = b_i.
+\end{equation}
+\hfill$\Box$
+
+\textbf{Problem 4. (Page 159 Exercise 9)} \textit{Proof.} We have for $y$
+\begin{equation}
+\norm{y}_A = \norm{ \sqrt{A} y }_2 \le \norm{\sqrt{A}}_2 \norm{y}_2 = \sqrt{\norm{A}}_2 \norm{y}_2
+\end{equation}
+and similarly
+\begin{equation}
+\norm{y}_2 \le \sqrt{\norm{A^{-1}}}_2 \norm{y}_A,
+\end{equation}
+where
+\begin{equation}
+\norm{\sqrt{A}}_2 = \sqrt{\norm{A}}_2
+\end{equation}
+follows from the fact that the eigenvectors of $A$ and $\sqrt{A}$ coincide. Hence,
+\begin{equation}
+\begin{split}
+\norm{ x_k - x_{\ast} }_2 &\le \sqrt{\norm{A^{-1}}}_2 \norm{ x_k - x_{\ast} }_A \\
+&\le 2 \sqrt{\norm{A^{-1}}}_2 \rbr{\frac{ \sqrt{\kappa_2} - 1 }{ \sqrt{\kappa_2} + 1 }}^k \norm{ x_0 - x_{\ast} }_A \\
+&\le 2 \sqrt{\kappa_2} \rbr{\frac{ \sqrt{\kappa_2} - 1 }{ \sqrt{\kappa_2} + 1 }}^k \norm{ x_0 - x_{\ast} }_2
+\end{split}
+\end{equation}
+as desired.
+\hfill$\Box$
+
+\textbf{Problem 5. (Page 159 Exercise 11)} \textit{Proof.} For $ \delta \in \mathcal{X} $ and any $\epsilon$,
+\begin{equation}
+\begin{split}
+&\ptrel{=} \norm{ x_k + \epsilon \delta - A^{-1} b }_A^2 \\
+&= \norm{ x_k - A^{-1} b }_A^2 + 2 \epsilon \delta^{\text{T}} A \rbr{ x_k - A^{-1} b } + \epsilon^2 \norm{\delta}_A^2.
+\end{split}
+\end{equation}
+Letting $ \epsilon \rightarrow 0 $,
+\begin{equation}
+\norm{ x_k + \epsilon \delta - A^{-1} b }_A^2 \ge \nvbr{\norm{ x_k + \epsilon \delta - A^{-1} b }_A^2}_{ \epsilon = 0 } = \norm{ x_k - A^{-1} b }_A^2
+\end{equation}
+yields
+\begin{equation}
+\delta^{\text{T}} A \rbr{ x_k - A^{-1} b } = -\delta^{\text{T}} r_k = 0,
+\end{equation}
+which means $ r_k \perp \mathcal{X} $.
+\hfill$\Box$
+
+\end{document}

@@ -1,0 +1,102 @@
+%! TeX encoding = UTF-8
+%! TeX program = LuaLaTeX
+
+\documentclass[english, nochinese]{pnote}
+\usepackage[paper]{pdef}
+\usepackage{pgf}
+
+\title{Answers to Coding Exercises (Chapter 6)}
+\author{Zhihan Li, 1600010653}
+\date{December 19, 2018}
+
+\begin{document}
+
+\maketitle
+
+\textbf{Problem. (Page 202 Exercise 2 (2) (3))} \textit{Answer.} We deploy implicit double-shift QR algorithm here, as shown in Algorithm 6.4.3 in the textbook. Once convergence is attained, we extract the diagonal blocks and find the eigenvalues. The eigenvectors are obtained through inverse power method. In the following experiments, the machine precision $\epsilon$ (which is denoted to be $\mathbf{u}$ in the textbook) is set to be 1e-15 for the implicit double-shift QR algorithm. The stopping criterion of inverse power method is set to be
+\begin{equation}
+\norm{ \tilde{v}^{\rbr{ k + 1 }} - v^{\rbr{k}} } < \epsilon,
+\end{equation}
+where we scale $ v^{\rbr{ k + 1 }} $ to $ \tilde{v}^{\rbr{ k + 1 }} $ by
+\begin{equation}
+\tilde{v}^{\rbr{ k + 1 }} = \frac{ v^{\rbr{ k + 1 }} }{ \rbr{v^{\rbr{k}}}^{\ast} v^{\rbr{ k + 1 }} / \abs{ \rbr{v^{\rbr{k}}}^{\ast} v^{\rbr{ k + 1 }} } }.
+\end{equation}
+
+(2). The roots of polynomial
+\begin{equation}
+p \rbr{x} = x^n + a_{ n - 1 } x^{ n - 1 } + a_{ n - 2 } x^{ n - 2 } + \cdots + a_1 x + a_0
+\end{equation}
+is actually the eigenvalues of the friend matrix
+\begin{equation}
+M_p = \msbr{ & & & & & & -a_0 \\ 1 & & & & & & -a_1 \\ & 1 & & & & & -a_2 \\ & & \ddots & & & & \vdots \\ & & & \ddots & & & -a_{ n - 3 } \\ & & & & 1 & & -a_{ n - 2 } \\ & & & & & 1 & -a_{ n - 1 } }.
+\end{equation}
+As the result, the (complex) roots of $ x^{41} + x^3 + 1 = 0 $ can be done by solving the eigenvalue problem. The figure of these eigenvalues are shown in Figure \ref{Fig:Root}.
+
+\begin{figure}
+\centering
+\input{Figure1.pgf}
+\caption{Roots of $ x^{41} + x^3 + 1 = 0 $}
+\label{Fig:Root}
+\end{figure}
+
+We also compare the numerical results with \verb"numpy.linalg.eig". We compare the error in eigenvalues by
+\begin{equation}
+\max_i \abs{ \lambda_1^{\rbr{i}} - \lambda_2^{\rbr{i}} }
+\end{equation}
+and in eigenvectors by
+\begin{equation}
+\max_i \norm{ \phi_1^{\rbr{i}} - \tilde{\phi}_2^{\rbr{i}} },
+\end{equation}
+where $\phi_1^{\rbr{i}}$ and $\phi_2^{\rbr{i}}$ are normalized eigenvectors and we scale $\phi_2^{\rbr{i}}$ to $\tilde{\phi}_2^{\rbr{i}}$ by
+\begin{equation}
+\tilde{\phi}_2^{\rbr{i}} = \frac{ \phi_2^{\rbr{i}} }{ \rbr{\phi_1^{\rbr{i}}}^{\ast} \phi_2^{\rbr{i}} / \abs{ \rbr{\phi_1^{\rbr{i}}}^{\ast} \phi_2^{\rbr{i}} } }.
+\end{equation}
+The results are shown in Table \ref{Tbl:Root}.
+
+\begin{table}
+\centering
+\begin{tabular}{|c|c|c|}
+\hline
+\#Iteration & Error in eigenvalues & Error in eigenvectors \\
+\hline
+\input{Table1.tbl}
+\end{tabular}
+\caption{Summary of numerical results finding roots of $ x^{41} + x^3 + 1 = 0 $}
+\label{Tbl:Root}
+\end{table}
+
+From the table, we conclude that the algorithm converges well, since the error in eigenvalues and eigenvectors are approximate of the same order as $\epsilon$. The number of iterations is about twice of the size of matrix, namely 41 here, which is compatible with description from textbook.
+
+(3). We plot the real and imaginary component of eigenvalues $\lambda$ in Figure \ref{Fig:EigenReal} and Figure \ref{Fig:EigenImag}.
+
+\begin{figure}
+\centering
+\input{Figure2.pgf}
+\caption{Eigenvalues of $A$ with respect to different $x$}
+\label{Fig:EigenReal}
+\end{figure}
+
+\begin{figure}
+\centering
+\input{Figure3.pgf}
+\caption{Eigenvalues of $A$ with respect to different $x$}
+\label{Fig:EigenImag}
+\end{figure}
+
+The numerical results are again summarized in Table \ref{Tbl:Eigen}.
+
+\begin{table}
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+$x$ & \#Iteration & Error in eigenvalues & Error in eigenvectors \\
+\hline
+\input{Table2.tbl}
+\end{tabular}
+\caption{Summary of numerical results finding eigenvalues of $A$}
+\label{Tbl:Eigen}
+\end{table}
+
+From the tables, we deduce that the algorithm converges well again. From the figures, we know the numerical eigenvalues are all reals, and changes ``continuously'' with respect to the parameter $x$. When $ x \ge 0.2 $, Two of the eigenvalues are real and the larger one increases with $x$ increases and the smaller one decreases. The other two eigenvalues are complex and are conjugate to each other. The absolute value of imaginary component increases as $x$ increases. At between 0.1 and 0.2, two real eigenvalues transform to complex ones. As a result, there is a ``jump'' in the imaginary component: for $ x \le 0.1 $ the imaginary components constantly vanishes but for $ x \ge 0.2 $ they suddenly appear.
+
+\end{document}

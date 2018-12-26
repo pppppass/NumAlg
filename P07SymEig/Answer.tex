@@ -1,0 +1,40 @@
+%! TeX encoding = UTF-8
+%! TeX program = LuaLaTeX
+
+\documentclass[english, nochinese]{pnote}
+\usepackage[paper]{pdef}
+\usepackage{pgf}
+
+\title{Answers to Coding Exercises (Chapter 7)}
+\author{Zhihan Li, 1600010653}
+\date{December 26, 2018}
+
+\begin{document}
+
+\maketitle
+
+\textbf{Problem. (Page 244 Exercise 1)} \textit{Answer.} We implement the threshold Jacobi method for solving the eigenvalue problem of real symmetric matrices. Both eigenvalues and eigenvectors are evaluated, while the eigenvalues are carried out by accumulating Given transformations on the identity matrix.
+
+We solve the eigenvalues and eigenvectors of the $ n \times n $ tri-diagonal matrix
+\begin{equation}
+A = \msbr{ 4 & 1 & & & & \\ 1 & 4 & 1 & & & \\ & 4 & 1 & \ddots & & \\ & & \ddots & \ddots & \ddots & \\ & & & \ddots & 4 & 1 \\ & & & & 1 & 4 },
+\end{equation}
+with $n$ varies from 1 to 100. The threshold are first set to 1 and then divided by 1e5 till 1e-15. The number of iterations are shown in Figure \ref{Fig:Iter} and the errors of eigenvalue and eigenvectors are recorded in Figure \ref{Fig:Err}. The error are calculated with the same procedure as described in Answers to Coding Exercises of Chapter 6. In brief, we match the eigenvectors, and then compare the maximum of 2-norm distance between aligned eigenvectors.
+
+\begin{figure}[htbp]
+\centering
+\input{Figure1.pgf}
+\caption{The number of iterations with respect to $n$}
+\label{Fig:Iter}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\input{Figure2.pgf}
+\caption{Errors with respect to $n$}
+\label{Fig:Err}
+\end{figure}
+
+From the figures, we conclude that the implemented threshold Jacobi method converges well. The number of iterations has slow growth because of the asymptotically quadratic convergence of the algorithm. One may observe that the error in eigenvalues grows approximately as linear of $n$ and the eigenvectors as quadratic of $n$, or maybe slightly larger. Numerical truncation error and increasing condition number accounts for error in eigenvalues. The error in eigenvectors results from the error in eigenvalues and the length of vectors.
+
+\end{document}

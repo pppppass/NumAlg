@@ -10,7 +10,9 @@ This repository relies on the personal TeX templates package [ptmpls](https://gi
 
 There are several sub folders in this repository:
 1. `ptmpls`: Personal TeX / LaTeX templates;
-2. `WxxExercise`: Written exercise for week `xx`.
+2. `WxxExercise`: Written exercises for week `xx`.
+3. `ExxExercise`: Written exercises for chapter `xx`.
+4. `CxxExercise`: Coding exercises for chapter `xx`.
 
 ## Environment
 

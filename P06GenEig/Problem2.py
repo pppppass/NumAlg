@@ -5,7 +5,6 @@
 
 
 import numpy
-import scipy.sparse
 from utils import geneig
 from matplotlib import pyplot
 

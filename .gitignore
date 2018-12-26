@@ -11,6 +11,7 @@
 *.run
 __pycache__/
 .*~/
+Temporary/
 
 # Generated files
 *.pdf

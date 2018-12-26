@@ -2,12 +2,18 @@ import numpy
 import scipy.sparse
 
 
-def get_lap_1d(size):
+def get_tri_const(size, alpha, beta, gamma):
     n = size
     a = numpy.zeros((n, n))
-    a.flat[::n+1] = 2.0
-    a.flat[1::n+1] = -1.0
-    a.flat[n::n+1] = -1.0
+    a.flat[::n+1] = alpha
+    a.flat[n::n+1] = beta
+    a.flat[1::n+1] = gamma
+    return a
+
+
+def get_lap_1d(size):
+    n = size
+    get_tri_const(n, 2.0, -1.0, -1.0)
     return a
 
 def get_lap_2d_sparse(size):

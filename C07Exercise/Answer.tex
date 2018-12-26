@@ -1,0 +1,135 @@
+%! TeX encoding = UTF-8
+%! TeX program = LuaLaTeX
+
+\documentclass[english, nochinese]{pnote}
+\usepackage[paper]{pdef}
+
+\title{Answers to Exercises (Chapter 7)}
+\author{Zhihan Li, 1600010653}
+\date{December 24, 2018}
+
+\begin{document}
+
+\maketitle
+
+\textbf{Problem 1. (Page 240 Exercise 2).} \textit{Proof.} Without loss of generality we assume $ i = 1 $. Take the matrix
+\begin{equation}
+B = \rbr{\sum_{ j \neq 1 } a_{ 1 j }^2 }^{ -1 / 2 } \rbr{ A - a_{ 1 1 } I } = \msbr{ 0 & b^{\text{T}} \\ b & B' }.
+\end{equation}
+If $B$ is not invertible at all, then we have find a eigenvalue $ a_{ 1 1 } $. If the first column of $ C = B^{-1} $ has 2-norm greater than unit, then $ \rho \rbr{C} > 1 $ and inverse power method provides a solution. Otherwise, $C$ also has the form
+\begin{equation}
+C = \msbr{ 0 & b^{\text{T}} \\ b & C' }
+\end{equation}
+but
+\begin{equation}
+B C = C B = I
+\end{equation}
+yields
+\begin{gather}
+b b^{\text{T}} + B' C' = b b^{\text{T}} + C' B' = I, \\
+B' b = C' b = 0.
+\end{gather}
+This further implies $B'$ and $C'$ can be simultaneously diagonalized and hence we directly assume they are diagonal matrices. However, $ b b^{\text{T}} = I - B' C' $ means $b$ has only one non-zero entry. By assume
+\begin{equation}
+b = \msbr{ 1 & 0 & 0 & \cdots & 0 }^{\text{T}}
+\end{equation}
+we deduce
+\begin{equation}
+C = \msbr{ 0 & 1 & \\ 1 & 0 & \\ & & \ast }
+\end{equation}
+and hence
+\begin{equation}
+\msbr{ 1 & -1 & 0 }^{\text{T}}
+\end{equation}
+is a eigenvector of eigenvalue $-1$ as desired.
+\hfill$\Box$
+
+\textbf{Problem 2. (Page 240 Exercise 3).} \textit{Proof.} Denote the minimal eigenvalue of $A$ to be $\lambda$. Hence we have
+\begin{equation}
+\rho \rbr{E} \le \norm{E}_2 < \norm{A^{-1}}_2^{-1} = \lambda.
+\end{equation}
+This implies the least eigenvalue of $ A + E $ is positive as desired.
+\hfill$\Box$
+
+\textbf{Problem 3. (Page 240 Exercise 6).} \textit{Proof.} Assume the singular value decomposition of $A$ is $ A = U \Sigma V^{\text{T}} $. We have directly $ \norm{A} = \sigma_1 $. Moreover,
+\begin{equation}
+A^{-1} = V \Sigma^{-1} U^{\text{T}}
+\end{equation}
+yields that the singular of $A^{-1}$ are inverse of that of $A$, which implies $ \norm{A^{-1}} = \sigma_n^{-1} $. Combining these, we reach
+\begin{equation}
+\kappa_2 \rbr{A} = \norm{A}_2 \norm{A^{-1}}_2  = \frac{\sigma_1}{\sigma_n}.
+\end{equation}
+\hfill$\Box$
+
+\textbf{Problem 4. (Page 241 Exercise 7).} \textit{Proof.} We prove the first equality first. Take $\mathcal{X}$ to be the space spanned by $ e_1, e_2, \cdots, e_i $ proves $\le$ part. The $\ge$ part needs to prove for any $ \mathcal{X} \in \mathcal{G}_i^n $,
+\begin{equation}
+\min_{ 0 \neq u \in \mathcal{X} } \frac{\norm{ A u }_2}{\norm{u}_2} \le \sigma_i.
+\end{equation}
+This is because $\mathcal{X}$ must intersect non-trivially with the space $V$ spanned by $ e_i, e_{ i + 1 }, \cdots, e_n $ (since the dimension sums up to $ n + 1 $). Let $v$ is a unit vector in the intersection, and we deduce
+\begin{equation}
+\norm{ A v }_2 \le \sigma_i \norm{v}_2
+\end{equation}
+since the largest singular value of $\nvbr{A}_V$ is $\sigma_i$ and therefore $ \norm{\nvbr{A}_V}_2 \le \sigma_i $.
+\hfill$\Box$
+
+\textbf{Problem 5. (Page 242 Exercise 14).} \textit{Proof.} Without loss of generality we assume $ p = 1 $ and $ q = 2 $, and it boils down to design a matrix with respect to
+\begin{equation}
+A = \msbr{ a_{ 1 1 } & a_{ 1 2 } \\ a_{ 2 1 } & a_{ 2 2 } }.
+\end{equation}
+We need to assume $A$ is real, since the complex setting yields that singular vectors of $ \Re A $ and $ \Im A $ coincides, which may not happen due to the uniqueness of singular vectors. In this case, since $A$ is real, $\theta_1$ and $\theta_2$ corresponds to the singular vectors, and therefore can be solved analytically as eigenvectors of $ A A^{\text{T}} $ and $ A^{\text{T}} A $ respectively.
+
+After $\theta_1$ and $\theta_2$ have been given, the equality with $E$ is trivial (both sides vanishes) in the $ 2 \times 2 $ case. The equality is applicable to arbitrary size because $ J \rbr{ p, q, \theta_1 } $ and $ J \rbr{ p, q, \theta_2 } $ does not change the sum of squares of entries outsides the $ \rbr{ p, q } \times \rbr{ p, q } $ slice.
+\hfill$\Box$
+
+\textbf{Problem 6. (page 242 Exercise 18).} \textit{Proof.} We need
+\begin{equation}
+d_{ i + 1 }^{-1} \gamma_i d_i = d_i^{-1} \beta_i d_{ i + 1 }
+\end{equation}
+and the diagonal matrix is given by its diagonal entries
+\begin{equation}
+d_i = \prod_{ j = 1 }^{ i - 1 } \sqrt{\frac{\gamma_j}{\beta_j}}.
+\end{equation}
+\hfill$\Box$
+
+\textbf{Problem 7. (Page 242 Exercise 19).} \textit{Proof.} (1). We note that $ \xi_1 = 0 $ and
+\begin{equation}
+\alpha_1 \xi_1 + \beta_2 \xi_2 = 0
+\end{equation}
+leads to $ \xi_2 = 0 $. Again with
+\begin{equation}
+\beta_1 \xi_1 + \alpha_2 \xi_2 + \beta_2 \xi_3 = 0
+\end{equation}
+we deduce $ \xi_3 = 0 $. Using mathematical induction we deduce $\xi$ vanishes, contradicting the assumption of eigenvectors. Similarly, either $\xi_1$ nor $\xi_n$ can vanish.
+
+(2). When $ i = 1 $ the equality holds. When $ i = 2 $ the equality holds because
+\begin{equation}
+\text{LHS} = \beta_2 \xi_2 = \rbr{ \lambda - \alpha_1 } \xi_1 = \lambda - \alpha_1 = \text{RHS}.
+\end{equation}
+By comparing
+\begin{equation}
+p_i \rbr{\lambda} = \rbr{ \alpha_i - \lambda } p_{ i - 1 } \rbr{\lambda} - \beta_i^2 p_{ i - 2 } \rbr{\lambda}
+\end{equation}
+and
+\begin{equation}
+\beta_i \beta_{ i + 1 } \xi_{ i + 1 } + \rbr{ \lambda_i - \lambda } \beta_i \xi_i + \beta_i^2 \xi_{ i - 1 } = 0,
+\end{equation}
+the equality is verified for $ i \ge 3 $.
+\hfill$\Box$
+
+\textbf{Problem 8. (Page 243 Exercise 20).} \textit{Proof.} This is because for a irreducible tri-diagonal matrix, $ p_n \rbr{\lambda} $ has only single roots. As a result, $T$ can be decomposed into at least $k$ irreducible tri-diagonal matrices and hence there are at least $ k - 1 $ zeros on the sub-diagonal.
+\hfill$\Box$
+
+\textbf{Problem 9. (Page 243 Exercise 21).} \textit{Answer.} (1) We have $ p_0 \rbr{0} = 1 $, $ p_1 \rbr{0} = -2 $, $ p_2 \rbr{0} = 3 $, $ p_3 \rbr{0} = -4 $, $ p_4 \rbr{0} = 5 $ and therefore $T$ has 4 eigenvalues in $ \rbr{ -\infty, 0 } $. This means $T$ is negative definite.
+
+(2) We have $ p_0 \rbr{-2} = 1 $, $ p_1 \rbr{-2} = 0 $, $ p_2 \rbr{-2} = -1 $, $ p_3 \rbr{-2} = 0 $, $ p_4 \rbr{-2} = 1 $ and therefore $T$ has 2 eigenvalues in $ \rbr{ -\infty, 2 } $. This means $T$ has 2 eigenvalues in $ \sbr{ -2, 0 } $ since $T$ is non-singular.
+
+\textbf{Problem 10. (Page 243 Exercise 24).} \textit{Answer.} Here $\rho$ can only be valued $ \pm \beta_{ m + 1 } $. As a result, direct test the two choices by plugging into
+\begin{equation}
+\min \cbr{ \abs{ \alpha_m - \rho }, \abs{ \alpha_{ m + 1 } - \rho } }
+\end{equation}
+suffices. To be exact, we may directly compare
+\begin{equation}
+\min \cbr{ \abs{ \alpha_m - \beta_{ m + 1 } }, \abs{ \alpha_{ m + 1 } - \beta_{ m + 1 } } }, \min \cbr{ \abs{ \alpha_m + \beta_{ m + 1 } }, \abs{ \alpha_{ m + 1 } + \beta_{ m + 1 } } }.
+\end{equation}
+
+\end{document}

@@ -21,7 +21,7 @@ Figure2.pgf Figure3.pgf Table2.tbl: $(wildcard Problem2.run)
 %.py: %.ipynb
 	jupyter nbconvert --to script $*
 
-%.run: %.py
+%.run: %.py utils/elim.py utils/ortho.py utils/geneig.py utils/models.py
 	python $<
 	touch $@
 

@@ -20,7 +20,10 @@ Temporary/
 *.ipynb
 *.dat
 *.dir
+*.png
 
 # External files
 
 # Private files
+.vscode/
+setup.cfg

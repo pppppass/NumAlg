@@ -1,0 +1,1111 @@
+%! TeX encoding = UTF-8
+%! TeX program = LuaLaTeX
+
+\documentclass[english, nochinese]{pnote}
+\usepackage{siunitx}
+\usepackage[paper, cgu]{pdef}
+\usepackage{pgf}
+\usepackage{multirow}
+
+\title{Report for Final Project}
+\author{Zhihan Li, 1600010653}
+\date{January 29, 2019}
+
+\begin{document}
+
+\maketitle
+
+\textbf{Problem.} \textit{Answer.} We solve the Stokes equation using geometric multi-grid methods. We test DGS (Distributive Gauss--Seidel) iterations and Uzawa iterations as smoothers. We implement spectral method using DST (discrete sine transform) and DCT (discrete cosine transform), CG (conjugate gradient) method and PCG (preconditioned conjugate gradient) method for exact or inexact Schur complement in Uzawa iterations. We benchmark the algorithms with $N$ ranging from 64 to 8192. We write C codes with all \emph{matrix-free} operations for computation and Python codes for visualization. We adopt the packages MKL, FFTW, SuperLU for computation and perform \emph{parallel} computation with OpenMP. The final numerical results are carried out on a 4-core personal computer.
+
+\section{Problem}
+
+\subsection{The Stokes equation}
+
+We consider the Stokes equation in this project, which is written as
+\begin{equation}
+\begin{cases}
+-\Delta \rbr{ u, v } + \nabla p = \rbr{ f, g }, \\
+\nabla \cdot \rbr{ u, v } = 0.
+\end{cases}
+\end{equation}
+We restrict our domain of interest on $ \Omega = \rbr{ 0, 1 } \times \rbr{ 0, 1 } $, and impose the boundary conditions
+\begin{equation}
+\begin{cases}
+\pdl{\mathbf{n}} u \rbr{ x, y } = c_{\text{W}} \rbr{y}, & \rbr{ x, y } \in \pdl{\text{W}} \Omega = \cbr{0} \times \sbr{ 0, 1 }; \\
+u \rbr{ x, y } = d_{\text{S}} \rbr{x}, & \rbr{ x, y } \in \pdl{\text{S}} \Omega = \sbr{ 0, 1 } \times \cbr{0}; \\
+\pdl{\mathbf{n}} u \rbr{ x, y } = c_{\text{E}} \rbr{y}, & \rbr{ x, y } \in \pdl{\text{E}} \Omega = \cbr{1} \times \sbr{ 0, 1 }; \\
+u \rbr{ x, y } = d_{\text{N}} \rbr{x}, & \rbr{ x, y } \in \pdl{\text{N}} \Omega = \sbr{ 0, 1 } \times \cbr{1}
+\end{cases}
+\end{equation}
+and
+\begin{equation}
+\begin{cases}
+v \rbr{ x, y } = d_{\text{W}} \rbr{y}, & \rbr{ x, y } \in \pdl{\text{W}} \Omega; \\
+\pdl{\mathbf{n}} v \rbr{ x, y } = c_{\text{S}} \rbr{x}, & \rbr{ x, y } \in \pdl{\text{S}} \Omega; \\
+v \rbr{ x, y } = d_{\text{E}} \rbr{y}, & \rbr{ x, y } \in \pdl{\text{E}} \Omega; \\
+\pdl{\mathbf{n}} v \rbr{ x, y } = c_{\text{N}} \rbr{x}, & \rbr{ x, y } \in \pdl{\text{N}} \Omega.
+\end{cases}
+\end{equation}
+Here $\mathbf{n}$ always stands for the normal vector of $\Omega$ pointing outwards.
+
+With the specified boundary condition, it is easy to be showed that the Stokes equation exists a solution \emph{up to a constant} on $p$ according to Brezzi theorem. Moreover, the equation is well-posed in the weak sense.
+
+\subsection{Model problems}
+
+We tackle the following model problems for our project. The first one is
+\begin{equation} \label{Eq:First}
+\begin{cases}
+u \rbr{ x, y } = \rbr{ 1 - \cos 2 \spi x } \sin \rbr{ 2 \spi y }, \\
+v \rbr{ x, y } = -\sin \rbr{ 2 \spi x } \rbr{ 1 - \cos \rbr{ 2 \spi x } }, \\
+p \rbr{ x, y } = x^3 / 3 - 1 / 12.
+\end{cases}
+\end{equation}
+We emphasize that $ p \rbr{ x, y } = x^3 / 3 $ and $ p \rbr{ x, y } = x^3 / 3 - 1 / 12 $ are totally equivalent. We do not bother writing $f$ and $g$, together with the boundary conditions $c_{\cdot}$ and $d_{\cdot}$ down, since they can be directly derived from the analytical solution.
+
+The second model problem we consider is
+\begin{equation} \label{Eq:Second}
+\begin{cases}
+u \rbr{ x, y } = \sin \rbr{ \kappa \rbr{ x^ 2- y } }, \\
+v \rbr{ x, y } = 2 x \sin \rbr{ \kappa \rbr{ x^2 - y } }, \\
+p \rbr{ x, y } = 2 \kappa x \cos \rbr{ \kappa \rbr{ x^2 - y } }.
+\end{cases}
+\end{equation}
+We set $ \kappa = 10 $ for following computation.
+
+The figures of $u$, $v$ and $p$ in these two sets of model problems are shown in Figure \ref{Fig:HeatMap}.
+
+\begin{figure}[htbp]
+{
+\centering
+\scalebox{0.75}{\input{Figure1.pgf}}
+\caption{Figures of $u$, $v$ and $p$ in model problems}
+\label{Fig:HeatMap}
+}
+{
+\footnotesize Left: the first model problem \eqref{Eq:First}; right: the second model problem \eqref{Eq:Second}.
+}
+\end{figure}
+
+\section{Discretization}
+
+We introduce the MAC (mark and cell) scheme to solve this equation. We divide the region $\Omega$ into $ N \times N $ cells, with size
+\begin{equation}
+h = \frac{1}{N}.
+\end{equation}
+We further denote
+\begin{gather}
+x_i = i h, \\
+y_j = j h.
+\end{gather}
+We set nodes of $u$ at $ \rbr{ x_i, y_{ j + 1 / 2 } } $, nodes of $v$ at $ \rbr{ x_{ i + 1 / 2 }, y_j } $ and nodes of $p$ at $ \rbr{ x_{ i + 1 / 2 }, y_{ j + 1 / 2 } } $. The equation
+\begin{equation}
+-\Delta u + \nabla p = f
+\end{equation}
+is discretized as
+\begin{equation} \label{Eq:LapU}
+\begin{split}
+&\ptrel{=} \frac{ 4 U_{ i, j + 1 / 2 } - U_{ i, j - 1 / 2 } - U_{ i, j + 3 / 2 } - U_{ i - 1, j + 1 / 2 } - U_{ i + 1, j + 1 / 2 } }{h^2} \\
+&+ \frac{ P_{ i + 1 / 2, j + 1 / 2 } - P_{ i - 1 / 2, j + 1 / 2 } }{h} = F_{ i, j + 1 / 2 }.
+\end{split}
+\end{equation}
+The equation
+\begin{equation}
+-\Delta v + \nabla p = g
+\end{equation}
+is discretized as
+\begin{equation} \label{Eq:LapV}
+\begin{split}
+&\ptrel{=} \frac{ 4 V_{ i + 1 / 2, j } - V_{ i + 1 / 2, j - 1 } - V_{ i + 1 / 2, j + 1 } - V_{ i - 1 / 2, j } - V_{ i + 3 / 2 , j } }{h^2} \\
+&+ \frac{ P_{ i + 1 / 2, j + 1 / 2 } - P_{ i + 1 / 2, j - 1 / 2 } }{h} = G_{ i + 1 / 2, j }.
+\end{split}
+\end{equation}
+The equation
+\begin{equation}
+\nabla \cdot \rbr{ u, v } = 0
+\end{equation}
+is discretized as
+\begin{equation}
+\frac{ U_{ i + 1, j + 1 / 2 } - U_{ i, j + 1 / 2 } }{h} + \frac{ V_{ i + 1 / 2, j + 1 } - V_{ i + 1 / 2, j } }{h} = 0.
+\end{equation}
+The local truncation error at each node is of second order $ O \rbr{h^2} $.
+
+We then impose the boundary condition. For Dirichlet boundaries ($u$ on $ \pdl{\text{W}} \Omega $ and $ \pdl{\text{E}} \Omega $ and $v$ on $ \pdl{\text{S}} \Omega $ and $ \pdl{\text{N}} \Omega $), we direct enforce the value of $U$ and $V$ respectively. To be exact, we set
+\begin{equation}
+U_{ i, j + 1 / 2 } = \rbr{D_{\cdot}}_{ j + 1 / 2 }
+\end{equation}
+and
+\begin{equation}
+V_{ i + 1 / 2, j } = \rbr{D_{\cdot}}_{ i + 1 / 2 }.
+\end{equation}
+For implementation, these nodes are dropped and values are added to the right hand side. On Neumann boundaries ($u$ on $ \pdl{\text{S}} \Omega $ and $ \pdl{\text{N}} \Omega $ and $v$ on $ \pdl{\text{W}} \Omega $ and $ \pdl{\text{E}} \Omega $), we impose
+\begin{equation} \label{Eq:GradU}
+\frac{ U_{ i, j \pm 1 / 2 } - U_{ i, j \mp 1 / 2 } }{h} = \rbr{C_{\cdot}}_i
+\end{equation}
+and
+\begin{equation} \label{Eq:GradV}
+\frac{ V_{ i \pm 1 / 2, j } - V_{ i \mp 1 / 2, j } }{h} = \rbr{C_{\cdot}}_j.
+\end{equation}
+For details, we set the ghost nodes $ U_{ i, -1 / 2 } $, $ U_{ i, \rbr{ 2 N + 1 } / 2 } $, $ V_{ -1 / 2, j } $ and $ V_{ \rbr{ 2 N + 1 } / 2, j } $ and eliminate them by linking the Laplacian stencil (\eqref{Eq:LapU} or \eqref{Eq:LapV}) and the gradient stencil (\eqref{Eq:GradU} or \eqref{Eq:GradV}).
+
+\subsection{Linear system}
+
+We adopt Einstein notation in this section for clearance and allow $i$ and $j$ to value half-integers if applicable. We further specify the arrangement of two-dimensional arrays: we denote the arrangement where $j$ is the last dimension varying fast by $ \rbr{ i j } $ and vice versa. This corresponds to row-major storage actually. For example, when we talk about the $ \rbr{ i j } $ arrangement of $ U_{ i j } $, we mean $ U_{ 1, 1 / 2 }, U_{ 1, 3 / 2 }, \cdots, U_{ 1, \rbr{ 2 N - 1 } / 2 }, U_{ 2, 1 / 2 }, \cdots, U_{ 2, \rbr{ 2 N - 1 } / 2 }, \cdots, U_{ N - 1, 1 / 2 }, \cdots, U_{ N - 1, \rbr{ 2 N - 1 } / 2 } $.
+
+If we summarize the discretized differential operator of the first equation to be
+\begin{equation} \label{Eq:TenA}
+\frac{1}{h^2} \rbr{ A_{ i j k l } U_{ k l } + B_{ i j k l } P_{ k l } },
+\end{equation}
+we then have the second equation
+\begin{equation}
+\frac{1}{h^2} \rbr{ A_{ j i l k } V_{ k l } + B_{ j i l k } P_{ k l } }
+\end{equation}
+and the third equation
+\begin{equation}
+\frac{1}{h^2} \rbr{ B_{ k l i j } U_{ k l } + B_{ l k j i } V_{ k l } }.
+\end{equation}
+We multiply $ 1 / h^2 $ here for brevity, which is frequently used in numerical differential equation solvers.
+
+We then consider the matrix form. Denote the matrix of $ A_{ i j k l } $ with rows arrangement $ \rbr{ i j } $ and columns $ \rbr{ k l } $ as $A_x$, and $ A_{ j i l k } $ with the same arrangement as $A_y$. We again denote the matrix of $ B_{ i j k l } $ with rows $ \rbr{ i j } $ and columns $ \rbr{ k l } $ as $B_x$ and $ B_{ k l i i j } $ with the same arrangement as $B_y$. We also arrange $ U_{ i j } $, $ V_{ i j } $ and $ P_{ i j } $ as $U$, $V$ and $P$ with arrangment $ \rbr{ i j } $. We immediately have the linear system
+\begin{equation}
+\msbr{ A_x & & B_x \\ & A_y & B_y \\ B_x^{\text{T}} & B_y^{\text{T}} & } \msbr{ U \\ V \\ P } = \msbr{ C_x \\ C_y \\ C_{\text{i}} },
+\end{equation}
+where $C_x$, $C_y$ and $C_{\text{i}}$ can be derived directly for the discretization described above. Denote
+\begin{equation}
+A = \msbr{ A_x & \\ & A_y }
+\end{equation}
+and
+\begin{equation}
+B = \msbr{ B_x \\ B_y },
+\end{equation}
+the linear system is a saddle point problem
+\begin{equation}
+\msbr{ A & B \\ B^{\text{T}} & } \msbr{ U, V \\ P } = \msbr{ C_x, C_y \\ C_{\text{i}} }.
+\end{equation}
+To be exact, $A_x$ can be decomposed into $ \rbr{ N - 1 } \times \rbr{ N - 1 } $ block as
+\begin{equation}
+A_x = \msbr{ A_x^1 & -I & & & & \\ -I & A_x^1 & -I & & & \\ & -I & A_x^1 & \ddots & & \\ & & \ddots & \ddots & \ddots & \\ & & & \ddots & A_x^1 & -I \\ & & & & -I & A_x^1 }
+\end{equation}
+and $A_x^1$ is the $ N \times N $ matrix
+\begin{equation}
+A_x^1 = \msbr{ 3 & -1 & & & & \\ -1 & 4 & -1 & & & \\ & -1 & 4 & \ddots & & \\ & & \ddots & \ddots & \ddots & \\ & & & \ddots & 4 & -1 \\ & & & & -1 & 3 }.
+\end{equation}
+Similarly $A_y$ can be decomposed into $ N \times N $ block as
+\begin{equation}
+A_y = \msbr{ A_y^1 & -I & & & & \\ -I & A_y^2 & -I & & & \\ & -I & A_y^2 & \ddots & & \\ & & \ddots & \ddots & \ddots & \\ & & & \ddots & A_y^2 & -I \\ & & & & -I & A_y^1 }
+\end{equation}
+where $A_y^1$ and $A_y^2$ are $ \rbr{ N - 1 } \times \rbr{ N - 1 } $ matrix
+\begin{equation}
+A_y^1 = \msbr{ 3 & -1 & & & & \\ -1 & 3 & -1 & & & \\ & -1 & 3 & \ddots & & \\ & & \ddots & \ddots & \ddots & \\ & & & \ddots & 3 & -1 \\ & & & & -1 & 3 },
+A_y^2 = \msbr{ 4 & -1 & & & & \\ -1 & 4 & -1 & & & \\ & -1 & 4 & \ddots & & \\ & & \ddots & \ddots & \ddots & \\ & & & \ddots & 4 & -1 \\ & & & & -1 & 4 }.
+\end{equation}
+We note that $B_x$ cannot be easily written, but $B_y$ can be decomposed into $ \rbr{ N - 1 } \times \rbr{ N - 1 } $ block as
+\begin{equation}
+B_x = h \msbr{ B_x^1 & & & & & \\ & B_x^1 & & & & \\ & & B_x^1 & & & \\ & & & \ddots & & \\ & & & & B_x^1 & \\ & & & & & B_x^1 }
+\end{equation}
+and $B_x^1$ is the $ N \times \rbr{ N - 1 } $ matrix
+\begin{equation}
+B_x^1 = \msbr{ 1 & & & & & \\ -1 & 1 & & & & \\ & -1 & 1 & & & \\ & & \ddots & \ddots & & & \\ & & & \ddots & 1 & \\ & & & & -1 & 1 \\ & & & & & -1 }.
+\end{equation}
+We emphasize the $h$ coefficient of $B_x$ and $B_y$.
+
+From the matrix form, we immediately know that $A_x$ and $A_y$ are positive definite. However, the linear system has one-dimensional null space spanned $ \rbr{ U, V, P } = \rbr{ 0, 0, 1 } $. When the Stokes equation has all homogenous Dirichlet boundary, $C_{\text{i}}$ is exactly zero and the linear system is consistent. Otherwise, it is not always consistent since we should have
+\begin{equation}
+0 = \sbr{ 0, 0, 1 }^{\text{T}} \msbr{ A_x & & B_x \\ & A_y & B_y \\ B_x^{\text{T}} & B_y^{\text{T}} & } \msbr{ U \\ V \\ P } = \sbr{ 0, 0, 1 }^{\text{T}} \msbr{ C_x \\ C_y \\ C_{\text{i}} } = 1^{\text{T}} C_{\text{i}}.
+\end{equation}
+The consistency actually happens for our second model problem, caused by the error introduced by discretization of Dirichlet boundary condition. (Another perspective is we always have the identity
+\begin{equation}
+-\int_{ \pdl{\text{W}} \Omega } u \sd y - \int_{\pdl{\text{S}} \Omega } v \sd x + \int_{ \pdl{\text{E}} \Omega } u \sd y + \int_{\pdl{\text{N}} \Omega } v \sd x = \int_{\Omega} \nabla \cdot \rbr{ u, v } \sd x \sd y = 0,
+\end{equation}
+but the numerical quadrature implied by the discretization of boundary conditions always yields some error.) This difficulty comes from the nature of saddle point problem and FD (finite difference) discretization. There are mainly two ways to tackle this problem: by introducing regularization like vector norm $\norm{P}_2$ and solving the least square problem, or making modifications to $C_{\text{i}}$. We choose the second option: we shift $C_{\text{i}}$ by a constant such that $ 1^{\text{T}} C_{\text{i}} = 0 $. %Numerical result shows that there is no loss of convergence order.
+
+We note that due to discretization error, there are always difference between numerical solutions and analytical solutions, even if the linear system is solved precisely or even analytically. This is caused by the truncation error of discretized differential operators. We plot the figure of error and residue of the numerical solution yielded by a precisely solved linear system in Figure \ref{Fig:Precise}.
+
+\begin{figure}[htbp]
+\centering
+\scalebox{0.75}{\input{Figure2.pgf}}
+\caption{Error and residue between numerical solution with precisely solved linear system}
+\label{Fig:Precise}
+\end{figure}
+
+\section{Solvers}
+
+We discuss details of the solvers in this section. We do not bother repeat the whole algorithm here, which is already available on the material given.
+
+Without special annotation, the initial values of the iterative algorithms are all set to be identical zero.
+
+\subsection{Distributive Gauss-Seidel iterations}
+
+The DGS iterations consists of the following two steps:
+\begin{partlist}
+\item Gauss--Seidel iteration on the Poisson problem $ A_x U = C_x - B_x P $, $ A_y V = C_y - B_y P $;
+\item Distributive relaxation of the residue of incompressible condition $ C_{\text{i}} - B_x^{\text{T}} U - B_y^{\text{T}} V $ on $U$, $V$ and $P$ respectively.
+\end{partlist}
+The only modification is that appearance of $C_{\text{i}}$, since we need to handle inhomogeneous Dirichlet boundary condition and the residue from multi-grid formulation.
+
+The update order of Gauss-Seidel iteration and distributive relaxation is in accordance to the $ \rbr{ i j } $ arrangement of $ U_{ i j } $, $ V_{ i j } $ and $ P_{ i j } $. Preliminary experiments shows the arrangement $ \rbr{ i j } $ or $ \rbr{ j i } $ makes no big difference.
+
+In practice, we write parallel codes for Gauss--Seidel iterations and distributive relaxation. Details are discussed in Subsection \ref{SubSec:Par}.
+
+\subsection{Uzawa iterations}
+
+Uzawa iterations focuses on solving saddle point problems. To be exact, the system can be written as
+\begin{equation}
+\msbr{ A & B \\ & -S } \msbr{ U, V \\ P } = \msbr{ C_x, C_y \\ C_{\text{i}} - B^{\text{T}} A^{-1} \rbr{ C_x, C_y } },
+\end{equation}
+where
+\begin{equation}
+S = B^{\text{T}} A^{-1} B
+\end{equation}
+is the Schur complement. We can directly solves the equation $ A_x U = C_x - B_x P $ and $ A_y V = C_y - B_y P $ to get $U$ and $V$ given $P$, and what remains is to find a iteration scheme of $P$. For the Stokes equation, it can be established as
+\begin{partlist}
+\item Solving the Poisson problem $ A_x U^{\rbr{ k + 1 }} = C_x - B_x P^{\rbr{k}} $ and $ A_y V^{\rbr{ k + 1 }} = C_y - B_y P^{\rbr{k}} $;
+\item Relax $P$ by $ P^{\rbr{ k + 1 }} = P^{\rbr{k}} - \alpha \rbr{ C_{\text{i}} - B^{\text{T}} U^{\rbr{ k + 1 }} } $.
+\end{partlist}
+The iteration scheme of $P$ is actually
+\begin{equation}
+P^{\rbr{ k + 1 }} = \rbr{ I - \alpha S } P^{\rbr{k}} - \alpha \rbr{ C_{\text{i}} - B^{\text{T}} A^{-1} \rbr{ C_x, C_y } }
+\end{equation}
+For general $B$ and positive definite $A$, if the Schur complement $S$ is non-singular, the system has a unique solution. In this case, sufficient small $\alpha$ leads to convergence, but the best $\alpha$ should be selected to be
+\begin{equation} \label{Eq:OptAlpha}
+\alpha^{\star} = \frac{2}{ \lambda_{\text{min}} \rbr{S} + \lambda_{\text{max}} \rbr{S} },
+\end{equation}
+since
+\begin{equation}
+\rho \rbr{ I - \alpha S } = \max \rbr{ \abs{ 1 - \alpha \lambda_{\text{min}} \rbr{S} }, \abs{ 1 - \alpha \lambda_{\text{max}} \rbr{S} } }
+\end{equation}
+and minimizing this for $\alpha$ yields
+\begin{equation}
+\abs{ 1 - \alpha \lambda_{\text{min}} \rbr{S} } = \abs{ 1 - \alpha \lambda_{\text{max}} \rbr{S} },
+\end{equation}
+solving which we reach \eqref{Eq:OptAlpha}. However, the Stokes equation is not the case. We put the discussion in Subsection \ref{SubSec:Uzawa}.
+
+To solve the Poisson equation effectively, we consider the spectral method since $A_x$ and $A_y$ have structures. To be exact, $A_x$ can be diagonalized by DST (type I) on $x$ axis and DCT (type II) on $y$ axis. This actually the corollary of
+\begin{equation}
+A_x \rbr{\phi_{ m, n }}_{ i j } = \lambda_{ m, n } \rbr{\phi_{ m, n }}_{ i j }
+\end{equation}
+where $ \rbr{\phi_{ m, n }}_{ i j } $ is the $ \rbr{ i, j } $ arrangement of values at $ \rbr{ x_i, y_j } $ of the function
+\begin{equation}
+\phi_{ m, n } \rbr{ x, y } = \sin \frac{ m \spi x }{N} \cos \frac{ n \spi y }{N}
+\end{equation}
+and
+\begin{equation}
+\lambda_{ m, n } = 4 \sin^2 \frac{ m \spi }{ 2 N } + 4 \sin^2 \frac{ n \spi }{ 2 N }.
+\end{equation}
+Here $ m = 1, 2, \cdots, N - 1 $ and $ n = 0, 1, \cdots, N - 1 $. Note that $ \rbr{\phi_{ m, n }}_{ i j } $ are orthogonal to each other for different $m$ and $n$, and therefore this is exactly the spectrum decomposition of $A_x$. Since the eigenvalues are all tensor products of sine and cosine modes on $x$ and $y$ axis respectively, DST and DCT diagonalize. As a result, if we denote
+\begin{equation}
+A_x = Q^{\text{T}} \Lambda Q
+\end{equation}
+where $\Lambda$ is a diagonal matrix with the $ \rbr{ m n } $ arrangement of $ \lambda_{ m, n } $ (here $Q$ stands for the DST and DCT transformation matrix with $ \rbr{ m n } $ in row and $ \rbr{ i j } $ in column), we directly have
+\begin{equation}
+A_x^{-1} = Q^{\text{T}} \Lambda^{-1} Q,
+\end{equation}
+where $\Lambda^{-1} $ is a diagonal matrix with the $ \rbr{ m n } $ arrangement of $ \lambda_{ m, n }^{-1} $. We note that $Q^{\text{T}}$ is tractable again by applying DCT type III on $y$ axis and DST type I on $x$ axis. In practice, we invoke the famous FFTW package to perform fast DST and DCT. The computational cost for a single inversion of $A^{-1}$ is $ O \rbr{ N^2 \log N } $.
+
+We can approximate $S$, or say $A^{-1}$ by matrices, which leads to \emph{inexact} Uzawa iterations. We will try CG iterations and PCG iterations for such approximation. We note that the approximation of $A^{-1}$, say $\tilde{A}^{-1}$ may vary for different steps, this is because what we need is the convergence of products of $ I - \alpha B^{\text{T}} \tilde{A}^{-1} B $. However, for PCG, the preconditioner must be fixed in order to construct the Krylov subspace. As a result, it does not make sense to use CG for preconditioner in PCG, but it is applicable to make the approximation $\tilde{A}^{-1}$ in inexact Uzawa iterations.
+
+\section{Geometric multi-grid method}
+
+\subsection{Formulation}
+
+One single V-cycle of geometric multi-grid method towards the Stokes equation generally involves:
+\begin{partlist}
+\item Pre-smoothing of $U$, $V$ and $P$;
+\item Calculation of residue by
+\begin{gather}
+R_x = C_x - A_x U - B_x P, \\
+R_y = C_y - A_y V - B_y P, \\
+R_{\text{i}} = C_{\text{i}} - B_x^{\text{T}} U - B_y^{\text{T}} V;
+\end{gather}
+\item Restriction by
+\begin{gather}
+C_{ x, \text{coar} } = 4 \mathit{Res}_x R_x, \\
+C_{ y, \text{coar} } = 4 \mathit{Res}_y R_y, \\
+C_{ \text{i}, \text{coar} } = 4 \mathit{Res}_{\text{i}} R_{\text{i}};
+\end{gather}
+\item Descend into the coarse level and solve $U_{\text{coar}}$, $V_{\text{coar}}$ and $P_{\text{coar}}$ out of $ C_{ x, \text{coar} } $, $ C_{ y, \text{coar} } $ and $ C_{ \text{i}, \text{coar} } $;
+\item prolongation by
+\begin{gather}
+U_{\text{fine}} = \mathit{Pro}_x U_{\text{coar}}, \\
+V_{\text{fine}} = \mathit{Pro}_y V_{\text{coar}}, \\
+P_{\text{fine}} = \mathit{Pro}_{\text{i}} P_{\text{coar}};
+\end{gather}
+\item Correction of solution by
+\begin{gather}
+U \leftarrow U + U_{\text{fine}}, \\
+V \leftarrow V + V_{\text{fine}}, \\
+P \leftarrow P + P_{\text{fine}};
+\end{gather}
+\item Pre-smoothing of $U$, $V$ and $P$.
+\end{partlist}
+Here the coefficient $4$ in restriction comes from the multiplication of $h^2$ of the original equation in \eqref{Eq:TenA}. We always assume the restriction operator $\mathit{Res}_{\cdot}$ and the prolongation operator $\mathit{Pro}_{\cdot}$ is unitary, which means (locally, in the sense of ignore the boundary conditions) if some variable $X$ is identically $1$, then $ \mathit{Res}_{\cdot} X $ is again identically $1$ and so as $ \mathit{Pro}_{\cdot} X $. We denote the level, namely times of descending to a coarser level, of V-cycle to be $L$. For example, for vanilla iterations without any restriction and prolongation, is of level $ L = 0 $. We repeat a specified iterative algorithm, named ``smoother'', for $\nu_{\text{down}}$ times in pre-smoothing and $\nu_{\text{up}}$ times.
+
+We vary the smoother of $U$, $V$ and $P$ in the following experiments.
+
+\subsection{Implementation details}
+
+One important variable is the selection of restriction and prolongation operators. We choose the following restriction operator as convolution of
+\begin{gather}
+\mathit{Res}_x = \frac{1}{8} \msbr{ 1 & \times & 2 & \times & 1 \\ \times & \times & \ast & \times & \times \\ 1 & \times & 2 & \times & 1 }, \\
+\mathit{Res}_y = \frac{1}{8} \msbr{ 1 & \times & 1 \\ \times & \times & \times \\ 2 & \ast & 2 \\ \times & \times & \times \\ 1 & \times & 1 }, \\
+\mathit{Res}_{\text{i}} = \frac{1}{4} \msbr{ 1 & \times & 1 \\ \times & \ast & \times \\ 1 & \times & 1 }.
+\end{gather}
+Here $\ast$ is the placeholder of coarse nodes, $\times$ means an empty space and numbers stands for weights of fine nodes. The boundaries are handled according to type of boundaries conditions in the model problems. To be exact, on Dirichlet boundaries we assume the value at nodes vanishes, and on Neumann boundaries we make even extension to the ghost node. We always deploy homogenous boundary conditions, since the residue itself has homogenous boundary conditions.
+
+The prolongation operator is more complicated. Although we can always deploys the transpose of restriction operators, we use bilinear interpolation for the prolongation operator $\mathit{Pro}_x$ and $\mathit{Pro}_y$ since it is reported to behave better. We use kind of transpose for $\mathit{Pro}_{\text{i}}$, which set the value of the closest node on the coarse grid to fine ones. Preliminary experiment shows again this makes no big difference.
+
+There are some discussion about the restriction and prolongation operators presented in Subsection \ref{SubSec:MG}.
+
+We note that we have $ R_{ \text{coar}, \text{i} } $ satisfies $ 1^{\text{T}} R_{ \text{coar}, \text{i} } = 0 $, which preserves the consistency of saddle point problems.
+
+\section{Numerical results}
+
+\subsection{Multi-grid distributive Gauss-Seidel method}
+
+We first test the effect of geometric multi-grid method. We test with $ N = 256 $ on the first model problem. We set $ \nu_{\text{down}} = \nu_{\text{up}} = 2 $ and stopping criterion $ \epsilon_{\text{DGS}} = \text{1e-10} $. This means we terminate the algorithm as long as the norm of residues satisfies
+\begin{equation}
+\norm{R_x}_2, \norm{R_y}_2, \norm{R_{\text{i}}} < \epsilon_{\text{DGS}}.
+\end{equation}
+Here $\norm{\cdot}_2$ stands for vector 2-norm. There are distinction between the tolerance specified in assignment material and our tolerance $\epsilon_{\text{DGS}}$, and discussion can be seen in Subsection \ref{SubSec:Err}. We run the problem with 4 threads if not otherwise specified. The numerical results are summarized in Table \ref{Tbl:DGSVarL}.
+
+\begin{table}[htbp]
+{
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+$L$ & \#Iter. & Time (\Si{s}) & $\norm{R_x}_2$ & $\norm{R_y}_2$ & $\norm{R_{\text{i}}}_2$ \\
+\hline
+\input{Table01.tbl}
+\end{tabular}
+\caption{Influence of levels $L$ with DGS smoother}
+\label{Tbl:DGSVarL}
+}
+{
+\footnotesize We terminate the algorithm after 5000 iterations when not converged.
+}
+\end{table}
+
+In the case of $ N = 256 $, we can perform at most $ L = 6 $ since we cannot handle the case $ N = 2 $. It can be seen that the effect of V-cycle is dramatically strong: without multi-grid methods the algorithm converges very slowly, but as $L$ increases the number of iterations jumps down in a high speed. Moreover, the wall time of algorithm is decreased. This is because the effect of faster convergence easily margins out the cost of restriction and prolongation. We need to emphasize that iterating on coarse grids takes less time, and therefore only takes a small portion in the final wall time. The multi-grid method succeeds in boosting convergence.
+
+We then investigate the influence of $\nu_{\text{down}}$ and $\nu_{\text{up}}$. We take $ N = 2048 $, $ L = 9 $ and $ \epsilon_{\text{DGS}} = \text{1e-10} $ and test on the first problem. The numerical results are summarized in Table \ref{Tbl:DGSVarNu}.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+$\nu_{\text{down}}$ & $\nu_{\text{up}}$ & \#Iter. & Time (\Si{s}) & $\norm{R_x}_2$ & $\norm{R_y}_2$ & $\norm{R_{\text{i}}}_2$ \\
+\hline
+\input{Table02.tbl}
+\end{tabular}
+\caption{Influence of $\nu_{\text{down}}$ and $\nu_{\text{up}}$ with DGS smoother}
+\label{Tbl:DGSVarNu}
+\end{table}
+
+In the test with $ \nu_{\text{down}} + \nu_{\text{up}} = 4 $, we can see that the post-smoothing is much more important than pre-smoothing in this problem. As a result, we test along $ \nu_{\text{down}} = \nu_{\text{up}} $ and $ \nu_{\text{down}} = 0 $ to find the best value of $ \nu_{\text{down}} + \nu_{\text{up}} $. The numerical results show that the best value is about $3$ or $4$. As a result, we conclude $ \nu_{\text{down}} = \nu_{\text{up}} = 2 $ as a good policy and use this choice for further experiment.
+
+We test DGS algorithm on the two model problems. We take $ \nu_{\text{down}} = \nu_{\text{up}} = 2 $ and $ \epsilon_{\text{DGS}} = \text{1e-10} $. The numerical results are shown in Table \ref{Tbl:DGSVarNLProb1} and \ref{Tbl:DGSVarNLProb2}. Here $ e_U = U - u $, $ e_V = V - v $, $ e_P = P - p $ stand for errors and
+\begin{equation}
+\norm{e_{\cdot}}_{L^2} = h \norm{e_{\cdot}}_2
+\end{equation}
+means the norm in $L^2$ space. Here we note that we actually evaluate
+\begin{equation}
+h \norm{ \rbr{ I - \frac{1}{N^2} 1 1^{\text{T}} } \rbr{ P - p } }_2
+\end{equation}
+to remove the influence of the free constant.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+$N$ & $L$ & \#Iter. & Time (\Si{s}) & $\norm{R_x}_2$ & $\norm{R_y}_2$ & $\norm{R_{\text{i}}}_2$ \\
+\hline
+\input{Table031.tbl}
+\end{tabular}
+\begin{tabular}{|c|c|c|c|}
+\hline
+$N$ & $\norm{e_U}_{L^2}$ & $\norm{e_V}_{L^2}$ & $\norm{e_P}_{L^2}$ \\
+\hline
+\input{Table032.tbl}
+\end{tabular}
+\caption{Numerical results with different $N$ on the first model problem with DGS smoother}
+\label{Tbl:DGSVarNLProb1}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+$N$ & $L$ & \#Iter. & Time (\Si{s}) & $\norm{R_x}_2$ & $\norm{R_y}_2$ & $\norm{R_{\text{i}}}_2$ \\
+\hline
+\input{Table041.tbl}
+\end{tabular}
+\begin{tabular}{|c|c|c|c|}
+\hline
+$N$ & $\norm{e_U}_{L^2}$ & $\norm{e_V}_{L^2}$ & $\norm{e_P}_{L^2}$ \\
+\hline
+\input{Table042.tbl}
+\end{tabular}
+\caption{Numerical results with different $N$ on the second model problem with DGS smoother}
+\label{Tbl:DGSVarNLProb2}
+\end{table}
+
+We can observe that the geometric multi-grid method with DGS smoother is an effective solver to the Stokes problem. Interestingly, the number of V-cycles grows smaller when $N$ increases. The increment in V-cycle levels $L$ may account for this phenomenon. In addition, we can observe clean second order convergence in $L^2$ in both $U$, $V$ and $P$. This shows that our numerical solution to the Stokes equation enjoys expected convergence. The time costs grows approximately in second order, since the number of V-cycles is of $ O \rbr{1} $ and single step has time complexity $ O \rbr{N^2} $.
+
+\subsection{Multi-grid exact Uzawa method}
+
+We first test the Poisson problem solver using spectral method. The DST and DCT are invoked from FFTW package. We generate a random Gaussian matrix $u$ and solve the equation $ A_x U = A_x u $. The numerical results are summarized in Table \ref{Tbl:UzwSolveU}. We also test the solver of $A_y$ in Table \ref{Tbl:UzwSolveV} according to the same procedure.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+$N$ & Time (\Si{s}) & $ \norm{ A_x U - A_x u }_2 $ & $ \norm{ U - u }_2 $ \\
+\hline
+\input{Table05.tbl}
+\end{tabular}
+\caption{Results of Poisson problem solver for $A_x$ using spectral method}
+\label{Tbl:UzwSolveU}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|c|}
+\hline
+$N$ & Time (\Si{s}) & $ \norm{ A_y V - A_y v }_2 $ & $ \norm{ V - v }_2 $ \\
+\hline
+\input{Table06.tbl}
+\end{tabular}
+\caption{Results of Poisson problem solver for $A_y$ using spectral method}
+\label{Tbl:UzwSolveV}
+\end{table}
+
+We can see that the solution is fast and accurate. The time grows slightly above second order, as expected $ O \rbr{ N^2 \log N } $. The case $ N = 16384 $ takes more time because of memory issues. The solution of $A_y$ is slightly more slowly than $A_x$ because of the arrangement of matrix elements. To be exact, $ \rbr{ i j } $ arrangement means a lot of cache miss when accessing along $x$ axis. The implementation of FFTW yields faster DST type I but slower DCT type II and III. One may also observe that $ \norm{ U - u }_2 $ and $ \norm{ V - v }_2 $ increases as $N$ becomes larger. This is because of the accumulation in rounding error (as $ \norm{ A_x U - A u }_2 $ increases) and the increment of condition number.
+
+We then consider the effect of $\alpha$ in Uzawa iterations. We actually control $ \alpha h^2 $ due to the scaling in \eqref{Eq:TenA}. We test with $ N = 2048 $ and $ \epsilon_{\text{Uzawa}} = \text{1e-10} $. The numerical results are shown in Table \ref{Tbl:UzwVarAlpha}.
+
+\begin{table}[htbp]
+{
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+$ \alpha h^2 $ & \#Iter. & Time (\Si{s}) & $\norm{R_x}_2$ & $\norm{R_y}_2$ & $\norm{R_{\text{i}}}_2$ \\
+\hline
+\input{Table07.tbl}
+\end{tabular}
+\caption{Effect of $\alpha$ in Uzawa iterations}
+\label{Tbl:UzwVarAlpha}
+}
+{
+\footnotesize We terminate the algorithm after 100 iterations when not converged.
+}
+\end{table}
+
+We can see from the results that $ \alpha h^2 = 1 $ leads to fast convergence. Actually we can prove the two steps convergence, as discussed later in Subsection \ref{SubSec:Uzawa}. The convergence is slower when $ \alpha h^2 $ goes away from $1$.
+
+We then test the effect of multi-grid. We set $ N = 2048 $ and $ \epsilon_{\text{Uzawa}} = \text{1e-10} $. We set $ \nu_{\text{down}} = \nu_{\text{up}} = 2 $. The numerical results are shown in Table \ref{Tbl:UzwVarAlphaL}.
+
+\begin{table}[htbp]
+{
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\multicolumn{2}{|c|}{\multirow{2}*{$ \alpha h^2 $}} & \multicolumn{4}{c|}{$L$} \\
+\cline{3-6}
+\multicolumn{2}{|c|}{} & 0 & 1 & 2 & 3 \\
+\hline
+\input{Table08.tbl}
+\end{tabular}
+\caption{Effect of multi-grid methods for Uzawa iterations}
+\label{Tbl:UzwVarAlphaL}
+}
+{
+\footnotesize We terminate the algorithm after 30 iterations when not converged.
+}
+\end{table}
+
+We can observe that multi-grid method does not here. To be exact, applying multi-grid method increases the elapsed time, but have no effect on the number of iterations. This means we should choose not to use multi-grid methods to solve the problem directly.
+
+We finally test the Uzawa iterations on the two model problems. We set $ \alpha h^2 = 1 $ and remove the multi-grid mechanism, and set $ \epsilon_{\text{DGS}} = \text{1e-10} $. The numerical results are shown in Table \ref{Tbl:UzwVarNLProb1} and \ref{Tbl:UzwVarNLProb2}.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+$N$ & \#Iter. & Time (\Si{s}) & $\norm{R_x}_2$ & $\norm{R_y}_2$ & $\norm{R_{\text{i}}}_2$ \\
+\hline
+\input{Table091.tbl}
+\end{tabular}
+\begin{tabular}{|c|c|c|c|}
+\hline
+$N$ & $\norm{e_U}_{L^2}$ & $\norm{e_V}_{L^2}$ & $\norm{e_P}_{L^2}$ \\
+\hline
+\input{Table092.tbl}
+\end{tabular}
+\caption{Numerical results with different $N$ on the first model problem with Uzawa iterations}
+\label{Tbl:UzwVarNLProb1}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+$N$ & \#Iter. & Time (\Si{s}) & $\norm{R_x}_2$ & $\norm{R_y}_2$ & $\norm{R_{\text{i}}}_2$ \\
+\hline
+\input{Table101.tbl}
+\end{tabular}
+\begin{tabular}{|c|c|c|c|}
+\hline
+$N$ & $\norm{e_U}_{L^2}$ & $\norm{e_V}_{L^2}$ & $\norm{e_P}_{L^2}$ \\
+\hline
+\input{Table102.tbl}
+\end{tabular}
+\caption{Numerical results with different $N$ on the second model problem with Uzawa iterations}
+\label{Tbl:UzwVarNLProb2}
+\end{table}
+
+We can observe that the Uzawa iterations converge very well, especially in $\norm{R_{\text{i}}}_2$. We can also observe the second order convergence in $L^2$.
+
+\subsection{Multi-grid inexact Uzawa method with CG approximation}
+
+We test the Poisson problem solver using CG. We set $ \epsilon_{\text{CG}} = \text{1.0e-10} $. The numerical results are summarized in Table \ref{Tbl:CGSolveU} and \ref{Tbl:CGSolveV} according to the procedure mentioned before.
+
+\begin{table}[htbp]
+{
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+$N$ & \#Iter. & Time (\Si{s}) & $ \norm{ A_x U - A_x u }_2 $ & $ \norm{ U - u }_2 $ \\
+\hline
+\input{Table11.tbl}
+\end{tabular}
+\caption{Results of Poisson problem solver for $A_x$ using CG}
+\label{Tbl:CGSolveU}
+}
+{
+\footnotesize We terminate the algorithm after 5000 iterations if not converged.
+}
+\end{table}
+
+\begin{table}[htbp]
+{
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+$N$ & \#Iter. & Time (\Si{s}) & $ \norm{ A_y V - A_y v }_2 $ & $ \norm{ V - v }_2 $ \\
+\hline
+\input{Table12.tbl}
+\end{tabular}
+\caption{Results of Poisson problem solver for $A_y$ using CG}
+\label{Tbl:CGSolveV}
+}
+{
+\footnotesize We terminate the algorithm after 5000 iterations if not converged.
+}
+\end{table}
+
+We can see that the solution converges. The number of iterations grows linearly with respect to $N$. This is because iterative CG has the linear convergence speed
+\begin{equation}
+-\ln \rbr{ \sqrt{\kappa} - 1 }{ \sqrt{\kappa} + 1 } \approx \frac{1}{2} \ln \kappa,
+\end{equation}
+where the condition number $\kappa$ grows quadratically. As a result, the wall time has cubic growth since the single step iteration has time complexity $ O \rbr{N^3} $. We note that CG is generally faster than LU-based algorithm, which suffers from the time complexity $ O \rbr{N^6} $, but it is slower than spectral methods of $ O \rbr{ N^2 \log N } $.
+
+We then consider the inexact Uzawa iterations. For each inexact iteration, the initial guess of $U$ and $V$ are set to the value after last iteration. The stopping criterion is
+\begin{equation}
+\sqrt{\rho} < \min \cbr{ \epsilon_{\text{CG}}, \tau \norm{ C_{\text{i}} - B^{\text{T}} \rbr{ U^{\rbr{k}}, V^{\rbr{k}} } }_2 }.
+\end{equation}
+
+We first set $\tau$ to zero to investigate the influence of $\epsilon_{\text{CG}}$. We set $ N = 256 $ and $ \epsilon_{\text{Uzawa}} = \text{1e-10} $, together with $ \alpha h^2 = 1 $. The numerical results are shown in Table \ref{Tbl:IUzwVarEpsCG}.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+$\epsilon_{\text{CG}}$ & \#Iter. & Time (\Si{s}) & $\norm{R_x}_2$ & $\norm{R_y}_2$ & $\norm{R_{\text{i}}}_2$ \\
+\hline
+\input{Table13.tbl}
+\end{tabular}
+\caption{Influence of $\epsilon_{\text{CG}}$ in inexact Uzawa iterations with CG approximation}
+\label{Tbl:IUzwVarEpsCG}
+\end{table}
+
+From this table, we observe the sharp transition from ``not converged'' to ``converged'' when $\epsilon_{\text{CG}}$ is near $\epsilon_{\text{Uzawa}}$. Moreover, we can observe the final residue in $\norm{R_x}_2$ and $\norm{R_y}_2$ has the same order as $\epsilon_{\text{CG}}$. This means the convergence of CG is critical to the convergence of inexact Uzawa iterations. However, when $ \epsilon_{\text{CG}} \lesssim \epsilon_{\text{Uzawa}} $, the approximation of $A^{-1}$ is accurate enough and this should be seen as an exact Uzawa iteration. The two step convergence verifies the exactness. As a result, we conclude that in this problem inexact Uzawa iteration does not have much effect.
+
+We then proceed to consider the effect of $\tau$ in inexact Uzawa iteration, to see whether there is some sweet point. We set $ N = 256 $, $ \epsilon_{\text{Uzawa}} = \text{1e-10} $ and $ \epsilon_{\text{CG}} = \text{1e-11} $. The numerical results are shown in Table \ref{Tbl:IUzwVarTauAlpha}.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{2}{|c|}{\multirow{2}*{$ \tau $}} & \multicolumn{9}{c|}{$\alpha h^2$} \\
+\cline{3-11}
+\multicolumn{2}{|c|}{} \input{Table141.tbl} \\
+\hline
+\input{Table14.tbl}
+\end{tabular}
+\caption{Effect of $\tau$ for inexact Uzawa iterations with CG approximation}
+\label{Tbl:IUzwVarTauAlpha}
+\end{table}
+
+From this table, we observe that the number of iterations gets smaller as $\tau$ becomes smaller. There is a tradeoff between CG iterations and inexact Uzawa iterations, since larger $\tau$ means less CG iterations but more Uzawa iterations. If possible, we should find the balance between these two terms. However, due to the special structure of the problem, say two steps convergence, the best choice seems to be setting $ \tau = 0 $.
+
+We consider the effect of multi-grid methods. We set $ N = 256 $, $ \epsilon_{\text{Uzawa}} = \text{1e-10} $ and $ \epsilon_{\text{CG}} = \text{1e-11} $. The numerical results of $ \nu_{\text{down}} = \nu_{\text{up}} = 2 $ are shown in Table \ref{Tbl:IUzwVarAlphaLNu22} and $ \nu_{\text{down}} = 0 $, $ \nu_{\text{up}} = 1 $ in Table \ref{Tbl:IUzwVarAlphaLNu01}.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{2}{|c|}{\multirow{2}*{$\tau$}} & \multicolumn{7}{c|}{$L$} \\
+\cline{3-9}
+\multicolumn{2}{|c|}{} \input{Table151.tbl} \\
+\hline
+\input{Table15.tbl}
+\end{tabular}
+\caption{Effect of multi-grid methods when $ \nu_{\text{down}} = \nu_{\text{up}} = 2 $ for inexact Uzawa iterations with CG approximation}
+\label{Tbl:IUzwVarAlphaLNu22}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{2}{|c|}{\multirow{2}*{$\tau$}} & \multicolumn{7}{c|}{$L$} \\
+\cline{3-9}
+\multicolumn{2}{|c|}{} \input{Table161.tbl} \\
+\hline
+\input{Table16.tbl}
+\end{tabular}
+\caption{Effect of multi-grid methods when $ \nu_{\text{down}} = 0 $, $ \nu_{\text{up}} = 1 $ for inexact Uzawa iterations with CG approximation}
+\label{Tbl:IUzwVarAlphaLNu01}
+\end{table}
+
+It can be observed that multi-grid methods here decrease both the number of iterations and the elapsed time. However, the improvement is not so significant as in the case of DGS. There are indeed some sweet point: we can see in the $ \nu_{\text{down}} = 0 $, $ \nu_{\text{up}} = 1 $ case of $ \tau = 1 $, $ L = 3 $ is better than $ \tau = 0 $. Such margin is caused by the savings in CG iterations. However, such improvement is hard to analyze, since the initial value of CG iterations are constantly changing and therefore it is so difficult to tell how much CG iterations have been saved. Moreover, it remains mysterious why in some cases $ L = 5 $ is better than $ L = 6 $.
+
+Finally we test the (in)exact Uzawa iterations with CG approximation. We use parenthesis for ``in'' because we set $ \tau = 0 $, together with $ \epsilon_{\text{CG}} = \text{1e-11} $, which means the CG approximation is accurate enough for an exact Uzawa iteration. No multi-grid iterations are involved. The final numerical results of the two model problems are summarized in Table \ref{Tbl:IUzwVarNLProb1} and \ref{Tbl:IUzwVarNLProb2}.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+$N$ & \#Iter. & Time (\Si{s}) & $\norm{R_x}_2$ & $\norm{R_y}_2$ & $\norm{R_{\text{i}}}_2$ \\
+\hline
+\input{Table171.tbl}
+\end{tabular}
+\begin{tabular}{|c|c|c|c|}
+\hline
+$N$ & $\norm{e_U}_{L^2}$ & $\norm{e_V}_{L^2}$ & $\norm{e_P}_{L^2}$ \\
+\hline
+\input{Table172.tbl}
+\end{tabular}
+\caption{Numerical results with different $N$ on the first model problem with Uzawa iterations with CG approximation}
+\label{Tbl:IUzwVarNLProb1}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+$N$ & \#Iter. & Time (\Si{s}) & $\norm{R_x}_2$ & $\norm{R_y}_2$ & $\norm{R_{\text{i}}}_2$ \\
+\hline
+\input{Table181.tbl}
+\end{tabular}
+\begin{tabular}{|c|c|c|c|}
+\hline
+$N$ & $\norm{e_U}_{L^2}$ & $\norm{e_V}_{L^2}$ & $\norm{e_P}_{L^2}$ \\
+\hline
+\input{Table182.tbl}
+\end{tabular}
+\caption{Numerical results with different $N$ on the second model problem with Uzawa iterations with CG approximation}
+\label{Tbl:IUzwVarNLProb2}
+\end{table}
+
+It can be seen that this algorithm is significantly slower than previous algorithms. This is because of the slow speed of CG iterations. There are indeed possible sweet points with a non-zero $\tau$ and some multi-grid methods, but due to the unexplainable boost up and unstable behavior we do not test that strategy.
+
+\subsection{Multi-grid inexact Uzawa method with PCG approximation}
+
+We first test the PCG Poisson problem solver with MG preconditioner with GS smoother. We set $ \epsilon_{\text{CG}} = \text{1.0e-10} $. The numerical results are summarized in Table \ref{Tbl:PCGSolveU} and \ref{Tbl:PCGSolveV} according to the procedure mentioned before.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+$N$ & $L_{\text{PCG}} $ & \#Iter. & Time (\Si{s}) & $ \norm{ A_x U - A_x u }_2 $ & $ \norm{ U - u }_2 $ \\
+\hline
+\input{Table19.tbl}
+\end{tabular}
+\caption{Results of Poisson problem solver for $A_x$ using PCG with MG preconditioner}
+\label{Tbl:PCGSolveU}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+$N$ & $L_{\text{PCG}}$ & \#Iter. & Time (\Si{s}) & $ \norm{ A_y V - A_y v }_2 $ & $ \norm{ V - v }_2 $ \\
+\hline
+\input{Table20.tbl}
+\end{tabular}
+\caption{Results of Poisson problem solver for $A_y$ using CG with MG preconditioner}
+\label{Tbl:PCGSolveV}
+\end{table}
+
+We can see that the solution converges. The number of iterations remains approximately a constant due to the presence of MG preconditioner.
+
+We also investigate the parameters of MG preconditioned. We set $ \epsilon_{\text{CG}} = \text{1.0e-10} $. We set $ \nu_{ \text{PCG}, \text{down} } = \nu_{ \text{PCG}, \text{up} } = 4 $, and vary $L_{\text{PCG}}$. We use grid $ N = 256 $. The numerical results are summarized in Table \ref{Tbl:PCGSolveVarL}.
+
+\begin{table}[htbp]
+{
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+$L_{\text{PCG}} $ & \#Iter. & Time (\Si{s}) & $ \norm{ A_x U - A_x u }_2 $ & $ \norm{ U - u }_2 $ \\
+\hline
+\input{Table21.tbl}
+\end{tabular}
+\caption{Effect of MG preconditioner in the Poisson problem solver for $A_x$ using PCG}
+\label{Tbl:PCGSolveVarL}
+}
+{
+\footnotesize We terminate the algorithm after 1000 iterations if not converged.
+}
+\end{table}
+
+It can be seen that the multi-grid algorithm indeed significantly boost up the convergence as desired.
+
+We have already clear about the behavior of inexact Uzawa iterations, so we make a leap to consider the effect of multi-grid methods. We set $ N = 2048 $, $ \epsilon_{\text{Uzawa}} = \text{1e-10} $ and $ \epsilon_{\text{CG}} = \text{1e-11} $. We set $ \nu_{\text{down}} = 0 $, $ \nu_{\text{up}} = 1 $ for inexact Uzawa iterations, and $ \nu_{ \text{PCG}, \text{down} } = \nu_{ \text{PCG}, \text{up} } = 4 $ for the preconditioner. We test $ L_{\text{PCG}} = 9 $ in Table \ref{Tbl:IUzwVarAlphaLPCGMGGS6} and $ L_{\text{PCG}} = 8 $ in Table \ref{Tbl:IUzwVarAlphaLPCGMGGS5}.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{2}{|c|}{\multirow{2}*{$\tau$}} & \multicolumn{5}{c|}{$L$} \\
+\cline{3-7}
+\multicolumn{2}{|c|}{} \input{Table2211.tbl} \\
+\hline
+\input{Table221.tbl}
+\end{tabular}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{2}{|c|}{\multirow{2}*{$\tau$}} & \multicolumn{5}{c|}{$L$} \\
+\cline{3-7}
+\multicolumn{2}{|c|}{} \input{Table2221.tbl} \\
+\hline
+\input{Table222.tbl}
+\end{tabular}
+\caption{Effect of multi-grid methods for inexact Uzawa iterations with PCG approximation with $ L_{\text{PCG}} = 9 $ MG preconditioner}
+\label{Tbl:IUzwVarAlphaLPCGMGGS6}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{2}{|c|}{\multirow{2}*{$\tau$}} & \multicolumn{5}{c|}{$L$} \\
+\cline{3-7}
+\multicolumn{2}{|c|}{} \input{Table2311.tbl} \\
+\hline
+\input{Table231.tbl}
+\end{tabular}
+\begin{tabular}{|c|c|c|c|c|c|c|}
+\hline
+\multicolumn{2}{|c|}{\multirow{2}*{$\tau$}} & \multicolumn{5}{c|}{$L$} \\
+\cline{3-7}
+\multicolumn{2}{|c|}{} \input{Table2321.tbl} \\
+\hline
+\input{Table232.tbl}
+\end{tabular}
+\caption{Effect of multi-grid methods for inexact Uzawa iterations with PCG approximation with $ L_{\text{PCG}} = 8 $ MG preconditioner}
+\label{Tbl:IUzwVarAlphaLPCGMGGS5}
+\end{table}
+
+It can be observed again that multi-grid methods here decrease both the number of iterations and the elapsed tim in a not-so-significant manner. There are again sweet points. Moreover, at these sweet points, for example $ L_{\text{PCG}} = 9 $, $ L = 9 $, $ \tau = 1 $, the algorithm is comparable with multi-grid DGS method. However, there are no significant increment, and therefore it does not outperforms spectral method-based exact Uzawa iterations. One may further observe that $ L = 8 $ always lead to slower convergence both in time and number of iterations. We try explaining this phenomenon in Subsection \ref{SubSec:Smooth}.
+
+Finally we test the (in)exact Uzawa iterations with CG approximation. We set $ \tau = 0 $, with $ \epsilon_{\text{CG}} = \text{1e-11} $, which means the CG approximation is accurate enough for an exact Uzawa iteration. No multi-grid iterations are set. The final numerical results of the two model problems are summarized in Table \ref{Tbl:IUzwVarNLPCGMGProb1} and \ref{Tbl:IUzwVarNLPCGMGProb2}.
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+$N$ & \#Iter. & Time (\Si{s}) & $\norm{R_x}_2$ & $\norm{R_y}_2$ & $\norm{R_{\text{i}}}_2$ \\
+\hline
+\input{Table241.tbl}
+\end{tabular}
+\begin{tabular}{|c|c|c|c|}
+\hline
+$N$ & $\norm{e_U}_{L^2}$ & $\norm{e_V}_{L^2}$ & $\norm{e_P}_{L^2}$ \\
+\hline
+\input{Table242.tbl}
+\end{tabular}
+\caption{Numerical results with different $N$ on the first model problem with Uzawa iterations with PCG approximation with MG preconditioner}
+\label{Tbl:IUzwVarNLPCGMGProb1}
+\end{table}
+
+\begin{table}[htbp]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+$N$ & \#Iter. & Time (\Si{s}) & $\norm{R_x}_2$ & $\norm{R_y}_2$ & $\norm{R_{\text{i}}}_2$ \\
+\hline
+\input{Table251.tbl}
+\end{tabular}
+\begin{tabular}{|c|c|c|c|}
+\hline
+$N$ & $\norm{e_U}_{L^2}$ & $\norm{e_V}_{L^2}$ & $\norm{e_P}_{L^2}$ \\
+\hline
+\input{Table252.tbl}
+\end{tabular}
+\caption{Numerical results with different $N$ on the second model problem with Uzawa iterations with CG approximation with MG preconditioner}
+\label{Tbl:IUzwVarNLPCGMGProb2}
+\end{table}
+
+It can be seen that this algorithm is slightly slower than multi-grid method using DGS smoother. Again there are indeed possible sweet points with a non-zero $\tau$ and some multi-grid methods, but we do not carry on experiments since the phenomenon is not stable and explainable enough. Surprisingly, with $ \tau = 0 $, multi-level on the outer loop also helps saving time by saving PCG iterations.
+
+\section{Discussion} \label{Sec:Dis}
+
+\subsection{Parallel algorithm} \label{SubSec:Par}
+
+We perform parallel computations all along this project. We use OpenMP to achieve shared memory parallelism. In this case, the matrix operations, stencil operations and DCT, DST are easy to parallelized. (Although FFT is hard to perform on distributive memory machines, it is rather easy on a shared memory machine, to which the personal computer belongs.) The main issue lies in the Gauss--Seidel iteration of Poisson equations and distributive relaxation.
+
+There are indeed parallel implementation for Gauss--Seidel iterations, including the famous red-black Gauss-Seidel iterations, which ensures the final result is identical to serial programs. However, it is well known such implementations (which actually changes the order of iteration) slightly slow down convergence, and the barrier cost is expensive. On the contrary, there are asynchronous updates, which directly divide the region to several contiguous regions and carry on asynchronous Gauss--Seidel iterations. Such iterations results in stochastic output and ``chaotic'' update order, and is therefore called chaotic updates.
+
+In the case of multi-grid methods, the main task of Gauss--Seidel is to smooth the high frequency modes. That is to say, we do not care much about the exact convergence of such iteration. As a result, we apply asynchronous updates on find grids, say grid with $ N \ge 16 $, and conduct serial updates (no parallelism) on coarse grids. Using this strategy, the iterations enjoy a high acceleration ratio, while the convergence is not affected much. To be exact, preliminary experiment show that the number of iterations does not change actually.
+
+\subsection{Two-step convergence of Uzawa iterations} \label{SubSec:Uzawa}
+
+We have observed that the Uzawa iterations converges in two steps with $ \alpha h^2 = 1 $. Actually we can prove the two-step convergence.
+
+We claim $ B^{\text{T}} A^{-1} B = h^2 \rbr{ I - w w^{\text{T}} } $, where $w$ is a unit vector. We note that $B$ has entries $ O \rbr{h} $. This is an observation from the spectrum of $A_x$ and $A_y$. Since $A_x$ has the spectrum decomposition given by
+\begin{equation}
+A_x \rbr{ \phi_{ m, n } }_{ i j } = \lambda_{ m, n } \rbr{ \phi_{ m, n } }_{ i j }
+\end{equation}
+where
+\begin{equation}
+\phi_{ m, n } \rbr{ x, y } = \sin \frac{ m \spi x }{N} \cos \frac{ n \spi y }{N}
+\end{equation}
+and
+\begin{equation}
+\lambda_{ m, n } = 4 \sin^2 \frac{ m \spi }{ 2 N } + 4 \sin^2 \frac{ n \spi }{ 2 N }
+\end{equation}
+with $ m = 1, 2, \cdots, N - 1 $ and $ n = 0, 1, \cdots, N - 1 $, we conclude
+\begin{equation}
+B_x^{\text{T}} A_x^{-1} B_x \rbr{ \psi_{ m, n } }_{ i j } = h^2 \frac{ 4 \sin^2 \rbr{ m \spi / 2 N } }{\lambda_{ m, n }} \rbr{ \psi_{ m, n } }_{ i j }
+\end{equation}
+when with $ m, n = 0, 1, \cdots, N - 1 $ but $ \rbr{ m, n } \neq \rbr{ 0, 0 } $ and
+\begin{equation}
+B_x^{\text{T}} A_x^{-1} B_x \rbr{ \psi_{ 0, 0 } }_{ i j } = 0,
+\end{equation}
+where
+\begin{equation}
+\psi_{ m, n } \rbr{ x, y } = \cos \frac{ m \spi x }{N} \cos \frac{ n \spi y }{N}.
+\end{equation}
+The $h^2$ again comes from $B_x$. Similarly we have
+\begin{equation}
+B_y^{\text{T}} A_y^{-1} B_y \rbr{ \psi_{ m, n } }_{ i j } = h^2 \frac{ 4 \sin^2 \rbr{ n \spi / 2 N } }{\lambda_{ m, n }} \rbr{ \psi_{ m, n } }_{ i j }
+\end{equation}
+for $ \rbr{ m, n } \neq \rbr{ 0, 0 } $ or
+\begin{equation}
+B_y^{\text{T}} A_y^{-1} B_y \rbr{ \psi_{ 0, 0 } }_{ i j } = 0.
+\end{equation}
+Adding these together we immediately reach
+\begin{equation}
+B^{\text{T}} A^{-1} B \rbr{ \psi_{ m, n } }_{ i j } = h^2 \rbr{ \psi_{ m, n } }_{ i j }
+\end{equation}
+when $ \rbr{ m, n } \neq \rbr{ 0, 0 } $ or
+\begin{equation}
+B^{\text{T}} A^{-1} B \rbr{ \psi_{ 0, 0 } }_{ i j } = 0.
+\end{equation}
+Since the modes $ \rbr{ \psi_{ m, n } }_{ i j } / h^2 $ are orthogonal to each other, we deduce $ B^{\text{T}} A^{-1} B $ is a projection operator with eigenvalue $1$ of multiplicity $ N^2 - 1 $ and a simple eigenvalue $0$. This implies $ B^{\text{T}} A^{-1} B = h^2 \rbr{ I - w w^{\text{T}} } $. Moreover, we can set
+\begin{equation}
+w = \frac{1}{N} 1.
+\end{equation}
+
+Turn back to the proof of convergence. It is known that the iteration process of $P$ is given by
+\begin{gather}
+P^{\rbr{1}} = \rbr{ 1 - \alpha B^{\text{T}} A^{-1} B } P^{\rbr{0}} - \alpha \rbr{ C_{\text{i}} - B^{\text{T}} A^{-1} \rbr{ C_x, C_y } }.
+\end{gather}
+since $ \alpha h^2 = 1 $, $ Q = 1 - \alpha B^{\text{T}} A^{-1} B = w w^{\text{T}} $ is the projection matrix to the space spanned by $w$. If we denote $ R = - \alpha \rbr{ C_{\text{i}} - B^{\text{T}} A^{-1} \rbr{ C_x, C_y } } $, in what follows is
+\begin{equation}
+P^{\rbr{1}} = Q P^{\rbr{0}} + R = R + \text{const.},
+\end{equation}
+which means $P$ converge to $R$ in one single step, up to a constant. Note that we consider solutions regardless of such constant, and hence $P^{\rbr{1}}$ solves the original linear system. The Uzawa iterations then solve $U^{\rbr{2}}$ and $V^{\rbr{2}}$ from
+\begin{gather}
+A_x U + B_x P = C_x, \\
+A_y V + B_y P = C_y,
+\end{gather}
+which means $U^{\rbr{2}}$ and $V^{\rbr{2}}$ solves the original saddle point problem since $P^{\rbr{1}}$ is already exact. In conclusion, we have two-step convergence of $U$ and $V$ and single step convergence of $P$.
+
+So far we have explained the fast convergence of exact Uzawa iterations with $ \alpha h^2 = 1 $. But why this selection of $\alpha$ contradicts with
+\begin{equation}
+\alpha^{\star} = \frac{2}{ \lambda_{\text{min}} \rbr{ B^{\text{T}} A^{-1} B } + \lambda_{\text{max}} \rbr{ B^{\text{T}} A^{-1} B } } = \frac{2}{h^2}
+\end{equation}
+since we have already know $ \lambda_{\text{min}} \rbr{ B^{\text{T}} A^{-1} B } = 0 $ and $ \lambda_{\text{max}} \rbr{ B^{\text{T}} A^{-1} B } = h^2 $. This is because the saddle point problem is \emph{under-determined}, or say Schur complement $ S = B^{\text{T}} A^{-1} B $ is singular. The null space of $S$ is exactly ones vector $1$, and we need to take the quotient space, or say consider solutions \emph{up to a constant}. In this quotient space, we do not need to consider eigenvalues on such vector and hence the effective spectral radius is
+\begin{equation}
+\tilde{\rho} \rbr{ 1 - \alpha S } = \abs{ 1 - \alpha h^2 }.
+\end{equation}
+As we can see, $ \alpha h^2 = 1 $ leads to finite step convergence.
+
+\subsection{Restriction and prolongation operators} \label{SubSec:MG}
+
+In our implementation of multi-grid methods, two commonly used assumptions are violated:
+\begin{partlist}
+\item
+\begin{equation}
+\mathit{Pro}_{\cdot} = \mathit{Res}_{\cdot}^{\text{T}}
+\end{equation}
+\item
+\begin{equation}
+\mathit{Res} \msbr{ A_{\text{fine}} & B_{\text{fine}} \\ B_{\text{fine}}^{\text{T}} & } \mathit{Pro} = \msbr{ A_{\text{coar}} & B_{\text{coar}} \\ B_{\text{coar}}^{\text{T}} & }.
+\end{equation}
+\end{partlist}
+
+The first violation results from the selection of restriction and prolongation operators, and can be alleviated. This violation means the restricted matrix $ \rbr{ \mathit{Pro}_x, \mathit{Pro}_y } A_{\text{fine}} \rbr{ \mathit{Res}_x, \mathit{Res}_y } $ is not positive definite and hence the problem on coarse grid is not a saddle point problem. However, the second violation means the solvers on the coarse grid must be re-designed since the structure of coarse grid problems differ from that of fine grid problems. For example, in our case, the restricted $ \rbr{ \mathit{Pro}_x, \mathit{Pro}_y } A_{\text{fine}} \rbr{ \mathit{Res}_x, \mathit{Res}_y } $ is actually a matrix with 9 diagonals, while $A_{\text{fine}}$ has actually 5 diagonals. This results in difficulties to iteration methods utilizing the 5-diagonal structure, such as the DGS iterations.
+
+It is an interesting question to construct such operators. We consider the case of uniform (full) grid scheme to a Poisson problem. The restriction and prolongation operators can be set to
+\begin{equation}
+\mathit{Pro}^{\text{T}} = \mathit{Res} = \msbr{ \ast & \times & \ast & \times & \ast \\ \times & 1 / 4 & 1 / 2 & 1 / 4  & \times \\ \ast & 1 / 2 & 1 \rbr{\ast} & 1 / 2 & \ast \\ \times & 1 / 4 & 1 / 2 & 1 / 4  & \times \\ \ast & \times & \ast & \times & \ast }.
+\end{equation}
+This operator is designed by bilinear interpolation. However, if the operator on the fine grid is 5-point Laplacian, the operator on te coarse grid has 9-point support, namely it has 9 diagonals. This is again a violation to the second assumption. However, if we set 
+\begin{equation} \label{Eq:ResTri}
+\mathit{Pro}^{\text{T}} = \mathit{Res} = \msbr{ \ast & \times & \ast & \times & \ast \\ \times & \times & 1 / 2 & 1 / 2  & \times \\ \ast & 1 / 2 & 1 \rbr{\ast} & 1 / 2 & \ast \\ \times & 1 / 2 & 1 / 2 & \times  & \times \\ \ast & \times & \ast & \times & \ast },
+\end{equation}
+the operator on the fine grid is again discrete Laplacian with 5-point support.
+
+We can derive a FE (finite element) explanation to this phenomenon. It is well known that to the variational problem
+\begin{equation}
+a \rbr{ u, v } = \int \nabla u \cdot \nabla v = b \rbr{v},
+\end{equation}
+the stiffness matrix $A$ of triangular Lagrange elements applied on lattice nodes is 5-point Laplacian, while using rectangular elements the stiffness matrix has 9 diagonals. For either kind of elements, the finite element space on evenly spaced \emph{lattice} has a natural inclusion $ V_{ 2 h } \subseteq V_h $. Given a linear transformation $ T : V_{ 2 h } \subseteq V_h $, it yields a matrix $R$ by
+\begin{equation}
+T \rbr{\phi_{ 2 h, j }} = \phi_{ h, i } R_{ i j }.
+\end{equation}
+Hence, we may consider the restricted stiffness matrix
+\begin{equation}
+A' = R^{\text{T}} A R,
+\end{equation}
+which is actually
+\begin{equation}
+A'_{ i j } = a \rbr{ T \phi_{ 2 h, i }, T \phi_{ 2 h, j } }.
+\end{equation}
+Hence, when $T$ is identity and $V_h$ are finite element space with triangular elements ($R$ is not identity however), we ensure both $A$ and $A'$ are 5-diagonal matrices. Actually \eqref{Eq:ResTri} is designed according to this principle.
+
+But in the MAC scheme every thing gets complicated because of the half nodes, especially we do not have the inclusion, say $ V_{ 2 h } \nsubseteq V_h $. A possible choice is to consider the finite element interpolation towards $a$. For any $ u_{ 2 h } \in V_{ 2 h } $, we define $ T_1 \rbr{ u_{ 2 h } } $ to be the unique $ u_h \in V_h $ such that for all $ v_h \in V_h $,
+\begin{equation}
+a \rbr{ u_{ 2 h }, v_h } = a \rbr{ u_h, v_h };
+\end{equation}
+and $ T_2 \rbr{ u_{ 2 h } } $ to be the (not unique) $ u_h \in V_h $ such that for all $ v_{ 2 h } \in V_{ 2 h } $,
+\begin{equation}
+a \rbr{ u_{ 2 h }, v_{ 2 h } } = a \rbr{ u_h, v_{ 2 h } }.
+\end{equation}
+Under this definition,
+\begin{equation}
+A'_{ i j } = a \rbr{ T_1 \phi_{ 2 h, i }, T_2 \phi_{ 2 h, j } } = a \rbr{ \phi_{ 2 h, i }, T_2 \phi_{ 2 h, j } } = a \rbr{ \phi_{ 2 h, i }, \phi_{ 2 h, j } }
+\end{equation}
+is again a 5-diagonal matrix. Here we have
+\begin{equation}
+A' = R_2^{\text{T}} A R_1.
+\end{equation}
+However, we need to notice that the matrix form of $T_1$ and $T_2$ needs tedious calculation and we give up. This remains for further research.
+
+\subsection{Error and tolerance issues} \label{SubSec:Err}
+
+We discuss the influence of rounding error here. We set $ \epsilon = \text{1e-10} $ all over the project, which is equivalent to tolerance $ 10^{-10} / h^2 = 10^{-10} N^2 $ as specified in the original assignment material due to the $h^2$ coefficient in \eqref{Eq:TenA}. In general, for $ N = 256 $, we actually reach $ 2 \times 10^{-5} $ and $ 2 \times 10^{-3} $ for $ N = 2048 $.
+
+We argue that the $10^{-8}$ tolerance is intractable, which is specified in the assignment requirement. Denote the machine precision as $\mu$, which is of order $10^{-16}$ using double precision floating point numbers. When $u$, $v$ and $p$, whose entries arr all $ O \rbr{1} $, is perturbed with relative error $\mu$, the error results in $\norm{R_{\cdot}}_2$ is $ \mu O \rbr{N} $. As a result, we need to constrain
+\begin{equation}
+\mathit{tol} \ge \mu O \rbr{N} 
+\end{equation}
+to get a valid solution. On the contrary, the theory of numerical PDE (partial differential equations) yields the error estimation
+\begin{equation}
+\norm{e_{\cdot}}_{L^2} \lesssim \frac{1}{h} \mathit{tol} + h^2.
+\end{equation}
+We need to constrain
+\begin{equation}
+\mathit{tol} \le O \rbr{h^3}
+\end{equation}
+to reach a valid numerical solution of the Stokes equation. As a result, the tolerance specified by the assignment is $ N^2 \mathit{tol} \ge \mu O \rbr{N^3} $. When $ N = 2048 $, we can only achieve $10^{-6}$ and any linear solver will fail to converge under this tolerance. Moreover, from $ \mu O \rbr{N} \le O \rbr{h^3} $ we get $ N \le O \rbr{\sqrt[4]{\mu^{-1}}} = 10^{-4} $. For larger $N$, we must turn to quadruple precision floating point arithmetic. We choose $ \mathit{tol} = 10^{-10} $, which lies in the safely zone for $ N \le 2048 $.
+
+\subsection{Uzawa iterations as smoother} \label{SubSec:Smooth}
+
+Uzawa iterations shows not promising results combined with multi-grid methods. We observe the smoothing properties of Uzawa iterations. We conduct experiments on the first model problem. Parallel computation is disabled since we want to check deterministic results.
+
+We take $ N = 32 $ and construct $ U^{\rbr{0}} = U^{\ast} + \Delta U $, $ V^{\rbr{0}} = V^{\ast} + \Delta V $, $ P^{\rbr{0}} = P^{\ast} + \Delta P $. Here $U^{\ast}$, $V^{\ast}$ and $P^{\ast}$ stands for numerical solutions from exact Uzawa iterations. There are always difference between analytical solutions and numerical solutions, so we use numerical solutions here. Each one of the designed $ \Delta U $, $ \Delta V $ and $ \Delta P $ consists of two modes, among which one is of low frequency (half of the wavelength is between $1$ and $2$ in both $x$ and $y$ direction), and another is of high frequency (wavelength is $ O \rbr{h} $). The initial values are plotted in Figure \ref{Fig:Init}.
+
+\begin{figure}[htbp]
+\centering
+\scalebox{0.75}{\input{Figure3.pgf}}
+\caption{Initial profile}
+\label{Fig:Init}
+\end{figure}
+
+We then try DGS iterations with 10 steps on $U^{\rbr{0}}$, $V^{\rbr{0}}$ and $P^{\rbr{0}}$, and get the following Figure \ref{Fig:SmoothDGS}.
+
+\begin{figure}[htbp]
+\centering
+\scalebox{0.75}{\input{Figure4.pgf}}
+\caption{Smoothed profile using 10 DGS iterations}
+\label{Fig:SmoothDGS}
+\end{figure}
+
+It can be seen that DGS iterations wipe out the high frequency modes, but low frequency modes are reserved. In addition, modes in $P$ gets disappeared, and new errors appeared near the boundary.
+
+We then try exact Uzawa iterations with 10 steps with $ \alpha = 0.8 $. The figure is given in Figure \ref{Fig:SmoothUzw}.
+
+\begin{figure}[htbp]
+\centering
+\scalebox{0.75}{\input{Figure5.pgf}}
+\caption{Smoothed profile using 10 exact Uzawa iterations with $ \alpha = 0.8 $}
+\label{Fig:SmoothUzw}
+\end{figure}
+
+It can be see that modes in $P$ pollute $U$ and $V$, and the high frequency modes does not gat damped well. This means Uzawa iterations is not a good smoother. We may conduct an intuitive analysis on this phenomenon. Since $U$ and $V$ are directly solved from $P$, we need to investigate the modes in $P$. We have already find the iteration matrix of $P$ is $ \rbr{ I - w w^{\text{T}} } $, and therefore all modes has the same amplification factor as a result. To be exact, this is the nature of Schur complement iterations $ B^{\text{T}} A^{-1} B $. It is well know that $A$ has large amplification to high frequency modes, and therefore $A^{-1}$ damps these modes. As a result, GS iterations or damped Jacobi iterations smooth because they have a good approximation of $A^{-1}$, which indeed damp high frequency modes. However, the conjugation of $B$ makes the Schur complement $ B^{\text{T}} A^{-1} B $ have similar amplification to all modes.
+
+The case becomes worse as we adopt inexact Uzawa iterations. We test inexact Uzawa iterations with 10 steps with $ \alpha = 1 $, $ \rho_{\text{CG}} = 10^{-5} $ and $ \tau = 0 $. The figure is given in Figure \ref{Fig:SmoothIUzwCG10}. We also test 100 iterations in Figure \ref{Fig:SmoothIUzwCG1000}.
+
+\begin{figure}[htbp]
+\centering
+\scalebox{0.75}{\input{Figure6.pgf}}
+\caption{Smoothed profile using 10 inexact Uzawa iterations with $ \alpha = 1 $ and CG approximation}
+\label{Fig:SmoothIUzwCG10}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\scalebox{0.75}{\input{Figure7.pgf}}
+\caption{Smoothed profile using 100 inexact Uzawa iterations with $ \alpha = 1 $ and CG approximation}
+\label{Fig:SmoothIUzwCG1000}
+\end{figure}
+
+We can again see that high frequency modes are not damped. Moreover, since the inverse approximated by CG is nonlinear (by ``nonlinear'' we mean the generation of such $\tilde{A}^{-1}$ is dependent on residues $ \rbr{ C_x, C_y } - B P $ and even on history information), the modes does not gets damped a bit even after a large number of iterations, say 1000 iterations. The result shows significant influence of $\epsilon_{\text{CG}}$, and explain the failure of inexact Uzawa iterations towards this problem.
+
+we finally consider Uzawa iterations with GS smoother MG preconditioners. We first test with with $ \alpha = 1 $, $ \rho_{\text{CG}} = 10^{-5} $ and $ \tau = 0 $, with $ L_{\text{PCG}} = 3 $, $ \nu_{ \text{PCG}, \text{down} } = \nu_{ \text{PCG}, \text{up} } = 4 $. The figure is given in Figure \ref{Fig:SmoothIUzwPCGL6}. We also test with $ L_{\text{PCG}} = 2 $, and show in Figure \ref{Fig:SmoothIUzwPCGL5}. We test with 100 iterations. Compared to the previous numerical results, we conclude the ``sweet point'' of multi-grid inexact Uzawa iterations are caused by the savings of CG iterations, but not smoothing.
+
+\begin{figure}[htbp]
+\centering
+\scalebox{0.75}{\input{Figure8.pgf}}
+\caption{Smoothed profile using 10 inexact Uzawa iterations with $ \alpha = 1 $ and PCG approximation and $ L_{\text{PCG}} = 3 $}
+\label{Fig:SmoothIUzwPCGL6}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\scalebox{0.75}{\input{Figure9.pgf}}
+\caption{Smoothed profile using 10 inexact Uzawa iterations with $ \alpha = 1 $ and PCG approximation and $ L_{\text{PCG}} = 2 $}
+\label{Fig:SmoothIUzwPCGL5}
+\end{figure}
+
+We can see similar results with CG approximation: the modes hang at amplitude $10^{-7}$. However, the result is worse since one may observe some high-frequency are generated by the algorithm. When $ L_{\text{PCG}} = 2 $, the results gets worse since more and more high-frequency modes get involved. This explains the result that generally higher $L_{\text{PCG}}$ leads to better results for multi-grid methods with inexact Uzawa iterations with PCG approximation with multi-grid preconditioner with GS smoothers.
+
+\section{Conclusion}
+
+We have observed
+\begin{partlist}
+\item Multi-grid DGS iterations converge well, and solves the problem with $ N = 8192 $ in about 50 seconds;
+\item Exact Uzawa iterations are not compatible with multi-grid methods, and setting $ \alpha = 1 $ leads to two-step convergence; the fastest one solves the problem with $ N = 8192 $ in about 17 seconds;
+\item Inexact Uzawa iterations with CG approximations converge slightly more slowly, and there some sweet points of combinations of $\tau$ and $L$;
+\item Exact Uzawa iterations with $ \alpha = 1 $ and CG approximation which has multi-grid GS iterations as preconditioner converges faster, and solves the problem with $ N = 8192 $ in about 65 seconds; there are again some sweet points of combinations of $\tau$ and $L$, which solves the problem with $ N = 2018 $ in about $3$ seconds, on tie with DGS iterations.
+\end{partlist}
+In addition, we have observed
+\begin{partlist}
+\item DGS iterations are good smoothers for multi-grid methods;
+\item Uzawa iterations generally does not smooth high frequency modes well.
+\end{partlist}
+
+\end{document}

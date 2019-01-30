@@ -12,7 +12,7 @@ There are several sub folders in this repository:
 1. `ptmpls`: Personal TeX / LaTeX templates;
 2. `WxxExercise`: Written exercises for week `xx`.
 3. `ExxExercise`: Written exercises for chapter `xx`.
-4. `CxxExercise`: Coding exercises for chapter `xx`.
+4. `PxxYyyy`: Coding exercises with index `xx` realted to `Yyyy`.
 
 ## Environment
 

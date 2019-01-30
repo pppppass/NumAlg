@@ -1,7 +1,7 @@
 DIRS = $(shell ls -d */ | grep -v ptmpls)
 
 .PHONY: all
-all: hardware.txt environment.yml recursive
+all: hardware.txt environment.yml list.txt recursive
 
 hardware.txt:
 	echo 'lscpu:' > hardware.txt
@@ -13,6 +13,9 @@ hardware.txt:
 
 environment.yml:
 	conda env export | grep -v prefix > environment.yml
+
+list.txt:
+	ls */*.png | grep -v Temporary > list.txt
 
 .PHONY: recursive
 recursive: template

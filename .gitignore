@@ -15,12 +15,14 @@ Temporary/
 
 # Generated files
 *.pdf
+build/
 
 # Binary files
 *.ipynb
 *.dat
 *.dir
 *.png
+*.so
 
 # External files
 

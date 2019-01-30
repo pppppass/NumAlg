@@ -2,8 +2,7 @@ PFGOBJS = Figure1.pgf Figure2.pgf Figure3.pgf Figure4.pgf Figure5.pgf Figure6.pg
 TBLOBJS = Table01.tbl Table02.tbl Table031.tbl Table032.tbl Table03.tbl Table041.tbl Table042.tbl Table05.tbl Table06.tbl Table07.tbl Table08.tbl Table091.tbl Table092.tbl Table101.tbl Table102.tbl Table11.tbl Table12.tbl Table13.tbl Table141.tbl Table14.tbl Table151.tbl Table15.tbl Table161.tbl Table16.tbl Table171.tbl Table172.tbl Table181.tbl Table182.tbl Table19.tbl Table20.tbl Table21.tbl Table2211.tbl Table221.tbl Table2221.tbl Table222.tbl Table22.tbl Table2311.tbl Table231.tbl Table2321.tbl Table232.tbl Table23.tbl Table241.tbl Table242.tbl Table251.tbl Table252.tbl
 RUNOBJS = Problem0.run Problem1.run Problem2.run Problem3.run Problem4.run ProblemCorr.run
 PYDEPS = dgs.py drivers.py gs.py mat.py models.py pro.py res.py spec.py
-CDEPS = op/cg.c op/dgs.c op/gs.c op/mat.c op/mg.c op/op.c op/op.h op/pcg.c op/pro.c op/res.c op/setup.py op/spec.c op/wrappers.c
-
+CDEPS = op/cg.c op/dgs.c op/gs.c op/mat.c op/mg.c op/op.h op/pcg.c op/pro.c op/res.c op/spec.c op/wrappers.c
 
 .PHONY: all
 all: Report.pdf

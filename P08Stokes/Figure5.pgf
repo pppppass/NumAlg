@@ -593,7 +593,7 @@
 \definecolor{textcolor}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetstrokecolor{textcolor}%
 \pgfsetfillcolor{textcolor}%
-\pgftext[x=3.434266in,y=9.673414in,right,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont 1e−7}%
+\pgftext[x=3.434266in,y=9.673414in,right,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont 1e-7}%
 \end{pgfscope}%
 \begin{pgfscope}%
 \pgfsetbuttcap%
@@ -1035,7 +1035,7 @@
 \definecolor{textcolor}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetstrokecolor{textcolor}%
 \pgfsetfillcolor{textcolor}%
-\pgftext[x=7.457113in,y=7.203732in,left,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont −2}%
+\pgftext[x=7.457113in,y=7.203732in,left,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont -2}%
 \end{pgfscope}%
 \begin{pgfscope}%
 \pgfsetbuttcap%
@@ -1060,7 +1060,7 @@
 \definecolor{textcolor}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetstrokecolor{textcolor}%
 \pgfsetfillcolor{textcolor}%
-\pgftext[x=7.457113in,y=7.722862in,left,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont −1}%
+\pgftext[x=7.457113in,y=7.722862in,left,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont -1}%
 \end{pgfscope}%
 \begin{pgfscope}%
 \pgfsetbuttcap%
@@ -1141,7 +1141,7 @@
 \definecolor{textcolor}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetstrokecolor{textcolor}%
 \pgfsetfillcolor{textcolor}%
-\pgftext[x=7.359891in,y=9.673414in,right,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont 1e−8}%
+\pgftext[x=7.359891in,y=9.673414in,right,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont 1e-8}%
 \end{pgfscope}%
 \begin{pgfscope}%
 \pgfsetbuttcap%
@@ -1583,7 +1583,7 @@
 \definecolor{textcolor}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetstrokecolor{textcolor}%
 \pgfsetfillcolor{textcolor}%
-\pgftext[x=3.531488in,y=3.648013in,left,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont −2}%
+\pgftext[x=3.531488in,y=3.648013in,left,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont -2}%
 \end{pgfscope}%
 \begin{pgfscope}%
 \pgfsetbuttcap%
@@ -1608,7 +1608,7 @@
 \definecolor{textcolor}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetstrokecolor{textcolor}%
 \pgfsetfillcolor{textcolor}%
-\pgftext[x=3.531488in,y=4.140984in,left,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont −1}%
+\pgftext[x=3.531488in,y=4.140984in,left,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont -1}%
 \end{pgfscope}%
 \begin{pgfscope}%
 \pgfsetbuttcap%
@@ -1714,7 +1714,7 @@
 \definecolor{textcolor}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetstrokecolor{textcolor}%
 \pgfsetfillcolor{textcolor}%
-\pgftext[x=3.434266in,y=6.387080in,right,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont 1e−8}%
+\pgftext[x=3.434266in,y=6.387080in,right,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont 1e-8}%
 \end{pgfscope}%
 \begin{pgfscope}%
 \pgfsetbuttcap%
@@ -2156,7 +2156,7 @@
 \definecolor{textcolor}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetstrokecolor{textcolor}%
 \pgfsetfillcolor{textcolor}%
-\pgftext[x=7.457113in,y=3.859023in,left,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont −2}%
+\pgftext[x=7.457113in,y=3.859023in,left,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont -2}%
 \end{pgfscope}%
 \begin{pgfscope}%
 \pgfsetbuttcap%
@@ -2181,7 +2181,7 @@
 \definecolor{textcolor}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetstrokecolor{textcolor}%
 \pgfsetfillcolor{textcolor}%
-\pgftext[x=7.457113in,y=4.408139in,left,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont −1}%
+\pgftext[x=7.457113in,y=4.408139in,left,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont -1}%
 \end{pgfscope}%
 \begin{pgfscope}%
 \pgfsetbuttcap%
@@ -2262,7 +2262,7 @@
 \definecolor{textcolor}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetstrokecolor{textcolor}%
 \pgfsetfillcolor{textcolor}%
-\pgftext[x=7.359891in,y=6.387080in,right,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont 1e−8}%
+\pgftext[x=7.359891in,y=6.387080in,right,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont 1e-8}%
 \end{pgfscope}%
 \begin{pgfscope}%
 \pgfsetbuttcap%
@@ -2704,7 +2704,7 @@
 \definecolor{textcolor}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetstrokecolor{textcolor}%
 \pgfsetfillcolor{textcolor}%
-\pgftext[x=3.531488in,y=0.452303in,left,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont −1.5}%
+\pgftext[x=3.531488in,y=0.452303in,left,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont -1.5}%
 \end{pgfscope}%
 \begin{pgfscope}%
 \pgfsetbuttcap%
@@ -2729,7 +2729,7 @@
 \definecolor{textcolor}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetstrokecolor{textcolor}%
 \pgfsetfillcolor{textcolor}%
-\pgftext[x=3.531488in,y=0.834439in,left,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont −1.0}%
+\pgftext[x=3.531488in,y=0.834439in,left,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont -1.0}%
 \end{pgfscope}%
 \begin{pgfscope}%
 \pgfsetbuttcap%
@@ -2754,7 +2754,7 @@
 \definecolor{textcolor}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetstrokecolor{textcolor}%
 \pgfsetfillcolor{textcolor}%
-\pgftext[x=3.531488in,y=1.216575in,left,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont −0.5}%
+\pgftext[x=3.531488in,y=1.216575in,left,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont -0.5}%
 \end{pgfscope}%
 \begin{pgfscope}%
 \pgfsetbuttcap%
@@ -2860,7 +2860,7 @@
 \definecolor{textcolor}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetstrokecolor{textcolor}%
 \pgfsetfillcolor{textcolor}%
-\pgftext[x=3.434266in,y=3.100747in,right,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont 1e−7}%
+\pgftext[x=3.434266in,y=3.100747in,right,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont 1e-7}%
 \end{pgfscope}%
 \begin{pgfscope}%
 \pgfsetbuttcap%
@@ -3302,7 +3302,7 @@
 \definecolor{textcolor}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetstrokecolor{textcolor}%
 \pgfsetfillcolor{textcolor}%
-\pgftext[x=7.457113in,y=0.346528in,left,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont −8}%
+\pgftext[x=7.457113in,y=0.346528in,left,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont -8}%
 \end{pgfscope}%
 \begin{pgfscope}%
 \pgfsetbuttcap%
@@ -3327,7 +3327,7 @@
 \definecolor{textcolor}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetstrokecolor{textcolor}%
 \pgfsetfillcolor{textcolor}%
-\pgftext[x=7.457113in,y=0.659574in,left,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont −6}%
+\pgftext[x=7.457113in,y=0.659574in,left,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont -6}%
 \end{pgfscope}%
 \begin{pgfscope}%
 \pgfsetbuttcap%
@@ -3352,7 +3352,7 @@
 \definecolor{textcolor}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetstrokecolor{textcolor}%
 \pgfsetfillcolor{textcolor}%
-\pgftext[x=7.457113in,y=0.972620in,left,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont −4}%
+\pgftext[x=7.457113in,y=0.972620in,left,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont -4}%
 \end{pgfscope}%
 \begin{pgfscope}%
 \pgfsetbuttcap%
@@ -3377,7 +3377,7 @@
 \definecolor{textcolor}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetstrokecolor{textcolor}%
 \pgfsetfillcolor{textcolor}%
-\pgftext[x=7.457113in,y=1.285666in,left,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont −2}%
+\pgftext[x=7.457113in,y=1.285666in,left,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont -2}%
 \end{pgfscope}%
 \begin{pgfscope}%
 \pgfsetbuttcap%
@@ -3508,7 +3508,7 @@
 \definecolor{textcolor}{rgb}{0.000000,0.000000,0.000000}%
 \pgfsetstrokecolor{textcolor}%
 \pgfsetfillcolor{textcolor}%
-\pgftext[x=7.359891in,y=3.100747in,right,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont 1e−10}%
+\pgftext[x=7.359891in,y=3.100747in,right,base]{\color{textcolor}\sffamily\fontsize{10.000000}{12.000000}\selectfont 1e-10}%
 \end{pgfscope}%
 \begin{pgfscope}%
 \pgfsetbuttcap%

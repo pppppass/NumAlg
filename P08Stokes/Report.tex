@@ -218,7 +218,7 @@ The consistency actually happens for our second model problem, caused by the err
 \end{equation}
 but the numerical quadrature implied by the discretization of boundary conditions always yields some error.) This difficulty comes from the nature of saddle point problem and FD (finite difference) discretization. There are mainly two ways to tackle this problem: by introducing regularization like vector norm $\norm{P}_2$ and solving the least square problem, or making modifications to $C_{\text{i}}$. We choose the second option: we shift $C_{\text{i}}$ by a constant such that $ 1^{\text{T}} C_{\text{i}} = 0 $. %Numerical result shows that there is no loss of convergence order.
 
-We note that due to discretization error, there are always difference between numerical solutions and analytical solutions, even if the linear system is solved precisely or even analytically. This is caused by the truncation error of discretized differential operators. We plot the figure of error and residue of the numerical solution yielded by a precisely solved linear system in Figure \ref{Fig:Precise}.
+We note that due to discretization error, there are always difference between numerical solutions and analytical solutions, even if the linear system is solved precisely or even analytically. This is caused by the truncation error of discretized differential operators. We plot the figure of error of the numerical solution yielded by a precisely solved linear system in Figure \ref{Fig:Precise}. The residue of analical solutions are also plotted in this figure.
 
 \begin{figure}[htbp]
 \centering
